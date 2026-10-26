@@ -1,0 +1,247 @@
+{
+  "dimensions": {
+    "minecraft:overworld": {
+      "type": "horror_town:fog_harbor",
+      "generator": {
+        "type": "minecraft:noise",
+        "biome_source": {
+          "type": "minecraft:multi_noise",
+          "biomes": [
+            {
+              "biome": "horror_town:abyssal_trench",
+              "parameters": {
+                "temperature": [
+                  -2.0,
+                  2.0
+                ],
+                "humidity": [
+                  -2.0,
+                  2.0
+                ],
+                "continentalness": [
+                  -2.0,
+                  -0.75
+                ],
+                "erosion": [
+                  -2.0,
+                  2.0
+                ],
+                "weirdness": [
+                  -2.0,
+                  2.0
+                ],
+                "depth": [
+                  0.0,
+                  1.0
+                ],
+                "offset": 0.0
+              }
+            },
+            {
+              "biome": "horror_town:murky_sea",
+              "parameters": {
+                "temperature": [
+                  -2.0,
+                  2.0
+                ],
+                "humidity": [
+                  -2.0,
+                  2.0
+                ],
+                "continentalness": [
+                  -0.75,
+                  -0.19
+                ],
+                "erosion": [
+                  -2.0,
+                  2.0
+                ],
+                "weirdness": [
+                  -2.0,
+                  2.0
+                ],
+                "depth": [
+                  0.0,
+                  1.0
+                ],
+                "offset": 0.0
+              }
+            },
+            {
+              "biome": "horror_town:salt_flats",
+              "parameters": {
+                "temperature": [
+                  -2.0,
+                  2.0
+                ],
+                "humidity": [
+                  -2.0,
+                  -0.25
+                ],
+                "continentalness": [
+                  -0.19,
+                  0.0
+                ],
+                "erosion": [
+                  -2.0,
+                  2.0
+                ],
+                "weirdness": [
+                  -2.0,
+                  2.0
+                ],
+                "depth": [
+                  0.0,
+                  1.0
+                ],
+                "offset": 0.0
+              }
+            },
+            {
+              "biome": "horror_town:fog_marsh",
+              "parameters": {
+                "temperature": [
+                  -2.0,
+                  2.0
+                ],
+                "humidity": [
+                  -0.25,
+                  2.0
+                ],
+                "continentalness": [
+                  -0.19,
+                  0.0
+                ],
+                "erosion": [
+                  -2.0,
+                  2.0
+                ],
+                "weirdness": [
+                  -2.0,
+                  2.0
+                ],
+                "depth": [
+                  0.0,
+                  1.0
+                ],
+                "offset": 0.0
+              }
+            },
+            {
+              "biome": "horror_town:salt_flats",
+              "parameters": {
+                "temperature": [
+                  -2.0,
+                  2.0
+                ],
+                "humidity": [
+                  -2.0,
+                  -0.35
+                ],
+                "continentalness": [
+                  0.0,
+                  2.0
+                ],
+                "erosion": [
+                  -2.0,
+                  2.0
+                ],
+                "weirdness": [
+                  -2.0,
+                  2.0
+                ],
+                "depth": [
+                  0.0,
+                  1.0
+                ],
+                "offset": 0.0
+              }
+            },
+            {
+              "biome": "horror_town:fog_marsh",
+              "parameters": {
+                "temperature": [
+                  -2.0,
+                  2.0
+                ],
+                "humidity": [
+                  -0.35,
+                  0.1
+                ],
+                "continentalness": [
+                  0.0,
+                  2.0
+                ],
+                "erosion": [
+                  -2.0,
+                  2.0
+                ],
+                "weirdness": [
+                  -2.0,
+                  2.0
+                ],
+                "depth": [
+                  0.0,
+                  1.0
+                ],
+                "offset": 0.0
+              }
+            },
+            {
+              "biome": "horror_town:drowned_grove",
+              "parameters": {
+                "temperature": [
+                  -2.0,
+                  2.0
+                ],
+                "humidity": [
+                  0.1,
+                  2.0
+                ],
+                "continentalness": [
+                  0.0,
+                  2.0
+                ],
+                "erosion": [
+                  -2.0,
+                  2.0
+                ],
+                "weirdness": [
+                  -2.0,
+                  2.0
+                ],
+                "depth": [
+                  0.0,
+                  1.0
+                ],
+                "offset": 0.0
+              }
+            }
+          ]
+        },
+        "settings": "horror_town:fog_harbor"
+      }
+    },
+    "minecraft:the_nether": {
+      "type": "minecraft:the_nether",
+      "generator": {
+        "type": "minecraft:noise",
+        "settings": "minecraft:nether",
+        "biome_source": {
+          "type": "minecraft:multi_noise",
+          "preset": "minecraft:nether"
+        }
+      }
+    },
+    "minecraft:the_end": {
+      "type": "minecraft:the_end",
+      "generator": {
+        "type": "minecraft:noise",
+        "settings": "minecraft:end",
+        "biome_source": {
+          "type": "minecraft:the_end"
+        }
+      }
+    }
+  }
+}

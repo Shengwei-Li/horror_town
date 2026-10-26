@@ -1,0 +1,13 @@
+{
+  "generator.horror_town.fog_harbor": "雾澳",
+  "generator.horror_town.fog_harbor.info": "灰色的、被淹没的海岸，天空从不放晴。",
+  "biome.horror_town.fog_marsh": "雾沼",
+  "biome.horror_town.drowned_grove": "吊杉林",
+  "biome.horror_town.murky_sea": "浊海",
+  "biome.horror_town.abyssal_trench": "渊沟",
+  "commands.horror_town.fog.set": "雾已设为 %s",
+  "commands.horror_town.fog.wrong_world": "这里没有雾的周期：这不是雾澳世界",
+  "block.horror_town.rot_mud": "腐泥",
+  "block.horror_town.salt_crust": "盐壳",
+  "block.horror_town.rotwood_log": "朽木原木"
+}

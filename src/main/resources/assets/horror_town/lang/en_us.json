@@ -1,0 +1,13 @@
+{
+  "generator.horror_town.fog_harbor": "Fog Harbor",
+  "generator.horror_town.fog_harbor.info": "A grey, drowned coast under a sky that never clears.",
+  "biome.horror_town.fog_marsh": "Fog Marsh",
+  "biome.horror_town.drowned_grove": "Drowned Grove",
+  "biome.horror_town.murky_sea": "Murky Sea",
+  "biome.horror_town.abyssal_trench": "Abyssal Trench",
+  "commands.horror_town.fog.set": "Fog set to %s",
+  "commands.horror_town.fog.wrong_world": "There is no fog cycle here: this is not a Fog Harbor world",
+  "block.horror_town.rot_mud": "Rot Mud",
+  "block.horror_town.salt_crust": "Salt Crust",
+  "block.horror_town.rotwood_log": "Rotwood Log"
+}

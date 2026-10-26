@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "horror_town:fog_marsh",
+    "horror_town:salt_flats",
+    "horror_town:drowned_grove",
+    "horror_town:murky_sea",
+    "horror_town:abyssal_trench"
+  ]
+}

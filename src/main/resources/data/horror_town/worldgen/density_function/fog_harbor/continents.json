@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:flat_cache",
+  "argument": {
+    "type": "horror_town:island_continents",
+    "wobble": "minecraft:overworld/continents",
+    "islets": {
+      "type": "minecraft:noise",
+      "noise": "horror_town:islets",
+      "xz_scale": 1.0,
+      "y_scale": 0.0
+    },
+    "radius": 2000.0
+  }
+}
