@@ -17,10 +17,10 @@
       "max_delay": 24000,
       "replace_current_music": false
     },
-    "water_color": 2502687,
-    "water_fog_color": 1317649,
-    "grass_color": 5134910,
-    "foliage_color": 4082227,
+    "water_color": 2501407,
+    "water_fog_color": 1185295,
+    "grass_color": 6185544,
+    "foliage_color": 5001280,
     "particle": {
       "options": {
         "type": "minecraft:white_ash"

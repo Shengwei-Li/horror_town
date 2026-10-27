@@ -1,6 +1,8 @@
 {
   "replace": false,
   "values": [
-    "horror_town:rotwood_log"
+    "horror_town:rotwood_log",
+    "horror_town:rotten_planks",
+    "horror_town:soaked_planks"
   ]
 }

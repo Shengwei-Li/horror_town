@@ -1,7 +1,7 @@
 {
   "replace": false,
   "values": [
-    "horror_town:fog_marsh",
+    "horror_town:mud_flats",
     "horror_town:salt_flats"
   ]
 }

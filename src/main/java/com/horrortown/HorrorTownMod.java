@@ -39,6 +39,9 @@ public class HorrorTownMod {
             event.accept(ModItems.ROT_MUD.get());
             event.accept(ModItems.SALT_CRUST.get());
             event.accept(ModItems.ROTWOOD_LOG.get());
+        } else if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
+            event.accept(ModItems.ROTTEN_PLANKS.get());
+            event.accept(ModItems.SOAKED_PLANKS.get());
         } else if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
             event.accept(ModItems.COPPER_COIN.get());
         } else if (event.getTabKey() == CreativeModeTabs.SPAWN_EGGS) {

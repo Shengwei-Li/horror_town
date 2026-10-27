@@ -17,10 +17,10 @@
       "max_delay": 24000,
       "replace_current_music": false
     },
-    "water_color": 3029548,
-    "water_fog_color": 1844250,
-    "grass_color": 5923911,
-    "foliage_color": 4870712
+    "water_color": 3027752,
+    "water_fog_color": 1711638,
+    "grass_color": 7039568,
+    "foliage_color": 5921348
   },
   "spawners": {
     "ambient": [
@@ -198,12 +198,8 @@
       "horror_town:dead_tree_common",
       "minecraft:patch_grass_normal",
       "minecraft:patch_dead_bush",
-      "minecraft:patch_waterlily",
       "minecraft:brown_mushroom_swamp",
-      "minecraft:red_mushroom_swamp",
-      "minecraft:patch_sugar_cane_swamp",
-      "minecraft:patch_pumpkin",
-      "minecraft:seagrass_swamp"
+      "minecraft:patch_pumpkin"
     ],
     [
       "minecraft:freeze_top_layer"

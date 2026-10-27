@@ -4,6 +4,7 @@ import com.horrortown.HorrorTownMod;
 import com.horrortown.world.IslandContinents;
 import com.horrortown.world.feature.DeadTreeFeature;
 import com.horrortown.world.feature.DrownedCypressFeature;
+import com.horrortown.world.feature.TideFilmFeature;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.levelgen.DensityFunction;
@@ -22,6 +23,9 @@ public final class ModWorldgen {
             FEATURES.register("drowned_cypress", () -> new DrownedCypressFeature(NoneFeatureConfiguration.CODEC));
     public static final DeferredHolder<Feature<?>, DeadTreeFeature> DEAD_TREE =
             FEATURES.register("dead_tree", () -> new DeadTreeFeature(NoneFeatureConfiguration.CODEC));
+
+    public static final DeferredHolder<Feature<?>, TideFilmFeature> TIDE_FILM =
+            FEATURES.register("tide_film", () -> new TideFilmFeature(NoneFeatureConfiguration.CODEC));
 
     static {
         DENSITY_FUNCTION_TYPES.register("island_continents", () -> IslandContinents.DATA_CODEC);

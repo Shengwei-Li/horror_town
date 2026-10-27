@@ -30,8 +30,8 @@ public record TownSite(BlockPos centre, Direction seaward) {
     private static final int MIN_RADIUS = 800;
     private static final int MAX_RADIUS = 3000;
     private static final int STEP = 8;
-    /** The coastline: continentalness where the town centre goes (see IslandContinents). */
-    private static final float COAST = -0.11F;
+    /** The seaward edge of the mud flats: continentalness where the town centre goes (see IslandContinents). */
+    private static final float COAST = -0.18F;
     private static final Map<Long, Optional<TownSite>> CACHE = new ConcurrentHashMap<>();
 
     public static Optional<TownSite> get(ChunkGenerator generator, RandomState random, LevelHeightAccessor height,
@@ -82,12 +82,12 @@ public record TownSite(BlockPos centre, Direction seaward) {
             }
         }
         int water = 0;
-        for (int d = 40; d <= 90; d += 6) {
-            if (surface(generator, random, height, centre.relative(seaward, d)) < sea - 1) {
+        for (int d = 50; d <= 110; d += 6) {
+            if (surface(generator, random, height, centre.relative(seaward, d)) < sea) {
                 water++;
             }
         }
-        return land >= 6 && water >= 7;
+        return land >= 6 && water >= 8;
     }
 
     private static int surface(ChunkGenerator generator, RandomState random, LevelHeightAccessor height, BlockPos pos) {

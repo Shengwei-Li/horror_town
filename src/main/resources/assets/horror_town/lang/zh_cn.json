@@ -39,5 +39,9 @@
   "townsfolk.horror_town.line.2.5": "……你为什么……还在岸上？",
   "townsfolk.horror_town.keeper.0": "香火要续，蜡烛不能断。断了，她就会自己出来看。",
   "townsfolk.horror_town.keeper.1": "外乡人想求什么？潮母什么都给，只是要拿东西换。",
-  "townsfolk.horror_town.keeper.2": "别在殿里大声说话。她在睡。"
+  "townsfolk.horror_town.keeper.2": "别在殿里大声说话。她在睡。",
+  "biome.horror_town.mud_flats": "泥滩",
+  "block.horror_town.tide_film": "浅水",
+  "block.horror_town.rotten_planks": "朽烂木板",
+  "block.horror_town.soaked_planks": "水渍木板"
 }

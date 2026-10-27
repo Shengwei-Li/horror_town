@@ -39,5 +39,9 @@
   "townsfolk.horror_town.line.2.5": "...why are you... still on the shore?",
   "townsfolk.horror_town.keeper.0": "The incense must burn, the candles must not go out. If they do, She comes out to look.",
   "townsfolk.horror_town.keeper.1": "What does the stranger want? The Tide Mother gives anything. For something in return.",
-  "townsfolk.horror_town.keeper.2": "Don't raise your voice in the hall. She is sleeping."
+  "townsfolk.horror_town.keeper.2": "Don't raise your voice in the hall. She is sleeping.",
+  "biome.horror_town.mud_flats": "Mud Flats",
+  "block.horror_town.tide_film": "Shallow Water",
+  "block.horror_town.rotten_planks": "Rotten Planks",
+  "block.horror_town.soaked_planks": "Soaked Planks"
 }

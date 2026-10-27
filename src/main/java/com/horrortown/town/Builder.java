@@ -44,6 +44,24 @@ public final class Builder {
         return origin.offset(new BlockPos(x, y, z).rotate(rotationFor(facing)));
     }
 
+    /** The same frame, moved {@code dy} blocks up (negative: down), e.g. for a house sunk into the mud. */
+    public Builder shifted(int dy) {
+        return new Builder(this.level, this.chunkBox, this.origin.above(dy), facingOf(this.rotation), this.seed);
+    }
+
+    /** A world direction as seen from this frame (the inverse of {@link #dir}). */
+    public Direction local(Direction world) {
+        return world.getAxis().isVertical() ? world : inverse(this.rotation).rotate(world);
+    }
+
+    private static Rotation inverse(Rotation rotation) {
+        return switch (rotation) {
+            case CLOCKWISE_90 -> Rotation.COUNTERCLOCKWISE_90;
+            case COUNTERCLOCKWISE_90 -> Rotation.CLOCKWISE_90;
+            default -> rotation;
+        };
+    }
+
     public BlockPos world(int x, int y, int z) {
         return toWorld(this.origin, facingOf(this.rotation), x, y, z);
     }

@@ -39,6 +39,7 @@ public final class ClientFog {
 
     private static final ResourceKey<Biome> DROWNED_GROVE = biome("drowned_grove");
     private static final ResourceKey<Biome> FOG_MARSH = biome("fog_marsh");
+    private static final ResourceKey<Biome> MUD_FLATS = biome("mud_flats");
     private static final ResourceKey<Biome> ABYSSAL_TRENCH = biome("abyssal_trench");
 
     private static float target;
@@ -86,6 +87,8 @@ public final class ClientFog {
             mist = 0.3F;
         } else if (here.is(ABYSSAL_TRENCH)) {
             mist = 0.15F;
+        } else if (here.is(MUD_FLATS)) {
+            mist = 0.12F;
         } else if (here.is(FOG_MARSH)) {
             mist = 0.08F;
         }

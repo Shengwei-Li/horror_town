@@ -1,6 +1,7 @@
 """Derives the Horror Town block textures from vanilla ones.
 
-Usage: python tools/gen_textures.py <dir with vanilla mud.png, spruce_log.png, spruce_log_top.png, calcite.png>
+Usage: python tools/gen_textures.py <dir with vanilla mud.png, spruce_log.png, spruce_log_top.png, calcite.png,
+                                      dark_oak_planks.png>
 """
 import random
 import sys
@@ -50,3 +51,22 @@ for (x, y), (dx, dy), n in cracks:
         if rng.random() < 0.85:
             px[cx, cy] = (118, 112, 104, 255)
 salt.save(OUT / "salt_crust.png")
+
+# 朽烂木板: dark planks gone grey-green with rot, flecked with mould and with a few black rotten holes
+rotten = grade(Image.open(SRC / "dark_oak_planks.png"), (0.95, 1.05, 0.95), (14, 16, 10), desat=0.55)
+px = rotten.load()
+for _ in range(18):
+    x, y = rng.randrange(16), rng.randrange(16)
+    r, g, b, a = px[x, y]
+    px[x, y] = (r - 6, g + 14, b - 4, a) if rng.random() < 0.6 else (r // 3, g // 3, b // 3, a)
+rotten.save(OUT / "rotten_planks.png")
+
+# 水渍木板: the same boards below the tide line, darker and soaked, with a pale salt crust along the top
+soaked = grade(Image.open(SRC / "dark_oak_planks.png"), (0.7, 0.78, 0.74), (4, 8, 6), desat=0.6)
+px = soaked.load()
+for x in range(16):
+    for y in (0, 1):
+        if rng.random() < 0.7:
+            r, g, b, a = px[x, y]
+            px[x, y] = (min(255, r + 60), min(255, g + 62), min(255, b + 56), a)
+soaked.save(OUT / "soaked_planks.png")

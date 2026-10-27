@@ -17,15 +17,16 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
+import org.lwjgl.glfw.GLFW;
 
 /**
  * Development only, off unless the game is started with {@code -Dhorror_town.autoshot}: once a singleplayer
- * world is loaded, turns the player into a spectator, steps through a set of camera spots around the town at
+ * world is loaded, minimizes the window, turns the player into a spectator, steps through a set of camera spots around the town at
  * different times of day and fog, saves a screenshot of each to {@code screenshots/ht_*.png}, then quits.
  */
 @EventBusSubscriber(modid = HorrorTownMod.MODID, value = Dist.CLIENT)
 public final class DevAutoShot {
-    private static final boolean ENABLED = System.getProperty("horror_town.autoshot") != null;
+    static final boolean ENABLED = System.getProperty("horror_town.autoshot") != null;
     /** Ticks to let chunks load before the first shot, and between shots. */
     private static final int WARMUP = 400;
     private static final int STEP = 140;
@@ -42,6 +43,8 @@ public final class DevAutoShot {
             {18000, 0.0F, 0, 2, -30, 0, 3, 20},
             {18000, 0.0F, 0, 2, 62, 0, 9, 78},
             {6000, 0.0F, 45, 30, 40, 0, 5, 30},
+            {6000, 0.0F, -25, 3, 10, -60, 0, 25},
+            {6000, 0.0F, 30, 25, -20, 80, 0, 40},
     };
 
     private static int ticks;
@@ -55,6 +58,11 @@ public final class DevAutoShot {
         IntegratedServer server = mc.getSingleplayerServer();
         if (!ENABLED || mc.level == null || mc.player == null || server == null) {
             return;
+        }
+        if (ticks == 0) {
+            // minimize as soon as the world is in, so the game does not hold on to the mouse and keyboard;
+            // it keeps rendering (and screenshotting) in the background
+            GLFW.glfwIconifyWindow(mc.getWindow().getWindow());
         }
         int t = ++ticks - WARMUP;
         if (t < 0) {

@@ -7,6 +7,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.RandomState;
+import net.minecraft.world.level.storage.PrimaryLevelData;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
@@ -29,6 +30,7 @@ public final class DevPregen {
     private static final int HALF_SIZE = 3600;
     private static final int STEP = 32;
     private static final Map<String, Integer> COLOURS = Map.of(
+            "mud_flats", 0x3A3528,
             "fog_marsh", 0x5E6B45,
             "salt_flats", 0xD8D4C4,
             "drowned_grove", 0x2F4A2A,
@@ -44,6 +46,10 @@ public final class DevPregen {
             return;
         }
         var server = event.getServer();
+        // the dev client opens this world unattended: skip the "experimental settings, make a backup?" prompt
+        if (server.getWorldData() instanceof PrimaryLevelData data) {
+            data.withConfirmedWarning(true);
+        }
         // drawing takes a while: do it off the server thread so the watchdog does not kill the server
         Thread thread = new Thread(() -> {
             try {

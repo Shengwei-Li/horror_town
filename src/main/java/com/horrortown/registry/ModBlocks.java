@@ -2,12 +2,14 @@ package com.horrortown.registry;
 
 import com.horrortown.HorrorTownMod;
 import com.horrortown.block.RotMudBlock;
+import com.horrortown.block.TideFilmBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -26,6 +28,18 @@ public final class ModBlocks {
             RotatedPillarBlock::new,
             BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_GRAY).instrument(NoteBlockInstrument.BASS)
                     .strength(2.0F).sound(SoundType.WOOD).ignitedByLava());
+
+    /** 朽烂木板 and 水渍木板: the boards the town is built from, rotten, and soaked below the tide line */
+    public static final DeferredBlock<Block> ROTTEN_PLANKS = BLOCKS.registerSimpleBlock("rotten_planks",
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_GRAY).instrument(NoteBlockInstrument.BASS)
+                    .strength(1.5F, 2.0F).sound(SoundType.WOOD).ignitedByLava());
+    public static final DeferredBlock<Block> SOAKED_PLANKS = BLOCKS.registerSimpleBlock("soaked_planks",
+            BlockBehaviour.Properties.of().mapColor(MapColor.TERRACOTTA_GRAY).instrument(NoteBlockInstrument.BASS)
+                    .strength(1.5F, 2.0F).sound(SoundType.WOOD));
+    /** 浅水: the thin film of water on the low mud flats */
+    public static final DeferredBlock<TideFilmBlock> TIDE_FILM = BLOCKS.registerBlock("tide_film", TideFilmBlock::new,
+            BlockBehaviour.Properties.of().mapColor(MapColor.WATER).replaceable().noCollission().noOcclusion()
+                    .instabreak().sound(SoundType.EMPTY).noLootTable().pushReaction(PushReaction.DESTROY));
 
     private ModBlocks() {
     }

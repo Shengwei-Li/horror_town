@@ -8,7 +8,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.RandomSource;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.chunk.ChunkGenerator;
@@ -26,6 +32,8 @@ public class TownPiece extends StructurePiece {
     public enum Kind {
         STREET, PIER, GATE, HOUSE, WELL, MARKET, WAREHOUSE, TEMPLE
     }
+
+    private static final int PAPER_WHITE = 0xE6E1D3;
 
     final Kind kind;
     final BlockPos origin;
@@ -87,6 +95,30 @@ public class TownPiece extends StructurePiece {
     public void postProcess(WorldGenLevel level, StructureManager structureManager, ChunkGenerator generator,
                             RandomSource random, BoundingBox chunkBox, ChunkPos chunkPos, BlockPos pivot) {
         Buildings.build(this, new Builder(level, chunkBox, this.origin, this.facing, this.seed));
+    }
+
+    /**
+     * 纸人: a paper effigy (an armour stand dressed in white) standing at a local spot, turned to face
+     * {@code facing} (a world direction).
+     */
+    void effigy(Builder b, int x, int y, int z, Direction facing) {
+        if (!b.inChunk(x, y, z)) {
+            return;
+        }
+        WorldGenLevel level = b.level();
+        BlockPos pos = b.world(x, y, z);
+        ArmorStand stand = new ArmorStand(level.getLevel(), pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
+        stand.setYRot(facing.toYRot());
+        stand.setYHeadRot(facing.toYRot());
+        stand.setYBodyRot(facing.toYRot());
+        for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
+            ItemStack paper = new ItemStack(slot == EquipmentSlot.CHEST ? Items.LEATHER_CHESTPLATE
+                    : slot == EquipmentSlot.LEGS ? Items.LEATHER_LEGGINGS : Items.LEATHER_BOOTS);
+            paper.set(DataComponents.DYED_COLOR, new DyedItemColor(PAPER_WHITE, false));
+            stand.setItemSlot(slot, paper);
+        }
+        stand.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.SKELETON_SKULL));
+        level.addFreshEntity(stand);
     }
 
     /** Puts a townsfolk at a local spot of this piece, if that spot is in the chunk being generated. */

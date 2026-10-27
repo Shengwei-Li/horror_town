@@ -30,6 +30,8 @@ public record IslandContinents(DensityFunction wobble, DensityFunction islets, d
     private static final double LOCAL_VARIATION = 0.08;
     /** Islet noise above this rises out of the sea; islets only appear this far out (fraction of radius). */
     private static final double ISLET_THRESHOLD = 0.5;
+    /** Islet noise above this already lifts the sea floor into shallows around the islet. */
+    private static final double ISLET_SHALLOWS = 0.3;
     private static final double ISLET_START = 1.2;
 
     @Override
@@ -43,10 +45,12 @@ public record IslandContinents(DensityFunction wobble, DensityFunction islets, d
         double value = profile(d) + wobble * LOCAL_VARIATION;
         if (r > ISLET_START) {
             double islet = this.islets.compute(context);
-            if (islet > ISLET_THRESHOLD) {
-                // fade islets in over the first stretch of open sea so none sit right off the coast
+            if (islet > ISLET_SHALLOWS) {
+                // fade islets in over the first stretch of open sea so none sit right off the coast; each one
+                // stands in a patch of shallows, so the nearer ones can be waded out to
                 double fade = Mth.clamp((r - ISLET_START) * 4.0, 0.0, 1.0);
-                value = Math.max(value, -0.5 + (islet - ISLET_THRESHOLD) * 2.6 * fade);
+                double rise = (islet - ISLET_SHALLOWS) / (ISLET_THRESHOLD - ISLET_SHALLOWS);
+                value = Math.max(value, Mth.lerp(fade, value, -0.45 + rise * 0.27));
             }
         }
         return Mth.clamp(value, -1.1, 1.0);
@@ -58,10 +62,11 @@ public record IslandContinents(DensityFunction wobble, DensityFunction islets, d
             return 0.55;
         } else if (d < 1.0) {
             return Mth.lerp((d - 0.3) / 0.7, 0.55, -0.2);
-        } else if (d < 1.25) {
-            return Mth.lerp((d - 1.0) / 0.25, -0.2, -0.6);
+        } else if (d < 1.35) {
+            // the long shallow shelf
+            return Mth.lerp((d - 1.0) / 0.35, -0.2, -0.5);
         }
-        return Mth.lerp(Math.min(1.0, (d - 1.25) / 0.4), -0.6, -1.0);
+        return Mth.lerp(Math.min(1.0, (d - 1.35) / 0.35), -0.5, -1.0);
     }
 
     @Override

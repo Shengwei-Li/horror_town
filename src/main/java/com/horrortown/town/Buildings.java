@@ -12,6 +12,10 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.RandomizableContainer;
 import net.minecraft.world.level.block.BarrelBlock;
+import net.minecraft.world.level.block.BaseCoralWallFanBlock;
+import net.minecraft.world.level.block.ButtonBlock;
+import net.minecraft.world.level.block.TrapDoorBlock;
+import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CandleBlock;
@@ -41,6 +45,8 @@ final class Buildings {
     private static final BlockState AIR = Blocks.AIR.defaultBlockState();
     private static final BlockState DARK_PLANKS = Blocks.DARK_OAK_PLANKS.defaultBlockState();
     private static final BlockState SPRUCE_PLANKS = Blocks.SPRUCE_PLANKS.defaultBlockState();
+    private static final BlockState BUTTON = Blocks.POLISHED_BLACKSTONE_BUTTON.defaultBlockState()
+            .setValue(ButtonBlock.FACE, AttachFace.WALL);
     private static final BlockState TILES = Blocks.DEEPSLATE_TILES.defaultBlockState();
     private static final BlockState COBWEB = Blocks.COBWEB.defaultBlockState();
     private static final BlockState FENCE = Blocks.DARK_OAK_FENCE.defaultBlockState();
@@ -58,9 +64,9 @@ final class Buildings {
 
     static void build(TownPiece piece, Builder b) {
         switch (piece.kind) {
-            case STREET -> boardwalk(b, piece.width, piece.length, false);
-            case PIER -> boardwalk(b, piece.width, piece.length, true);
-            case GATE -> gate(b);
+            case STREET -> boardwalk(piece, b, false);
+            case PIER -> boardwalk(piece, b, true);
+            case GATE -> gate(piece, b);
             case HOUSE -> house(piece, b);
             case WELL -> well(b);
             case MARKET -> market(piece, b);
@@ -75,9 +81,24 @@ final class Buildings {
         return ModBlocks.ROTWOOD_LOG.get().defaultBlockState().setValue(RotatedPillarBlock.AXIS, axis);
     }
 
+    /** Wall boards: mostly rotten, some still dark oak, the odd post; below the tide line they are soaked. */
     private static BlockState plank(Builder b, int x, int y, int z) {
         float r = b.rand(x, y, z, 1);
-        return r < 0.6F ? DARK_PLANKS : r < 0.9F ? SPRUCE_PLANKS : log(Direction.Axis.Y);
+        if (y <= 2 && r < 0.8F) {
+            return ModBlocks.SOAKED_PLANKS.get().defaultBlockState();
+        }
+        return r < 0.6F ? ModBlocks.ROTTEN_PLANKS.get().defaultBlockState() : r < 0.9F ? DARK_PLANKS
+                : log(Direction.Axis.Y);
+    }
+
+    /** Deck boards: rotten and dark oak. */
+    private static BlockState deck(Builder b, int x, int y, int z) {
+        return b.chance(x, y, z, 9, 0.6F) ? ModBlocks.ROTTEN_PLANKS.get().defaultBlockState() : DARK_PLANKS;
+    }
+
+    /** A chair (a stair) for someone to sit and look out to sea: its back to the land. */
+    private static BlockState chair(Builder b, Direction seaward) {
+        return stairs(Blocks.DARK_OAK_STAIRS, b.local(seaward.getOpposite()), Half.BOTTOM);
     }
 
     private static BlockState stone(Builder b, int x, int y, int z) {
@@ -121,7 +142,9 @@ final class Buildings {
      * The street and the piers. Over dry ground the street is a trodden mud path; over mud and water it becomes a
      * plank deck on rotten posts, with railings where it runs over water. Lanterns on posts every so often.
      */
-    private static void boardwalk(Builder b, int width, int length, boolean pier) {
+    private static void boardwalk(TownPiece piece, Builder b, boolean pier) {
+        int width = piece.width;
+        int length = piece.length;
         for (int z = 0; z < length; z++) {
             boolean overWater = b.get(width / 2, -2, z).is(Blocks.WATER);
             boolean onLand = !pier && !b.isOpen(width / 2, -1, z) && !b.get(width / 2, -1, z).is(BlockTags.LOGS);
@@ -135,11 +158,11 @@ final class Buildings {
                 if (edge && b.chance(x, 0, z, 4, 0.04F)) {
                     continue; // a rotten plank gone
                 }
-                b.set(x, 0, z, b.chance(x, 0, z, 5, 0.6F) ? DARK_PLANKS : SPRUCE_PLANKS);
+                b.set(x, 0, z, deck(b, x, 0, z));
             }
             if (onLand) {
-                // keep lanterns going along the path
-                if (z % 12 == 6) {
+                // keep a lantern going along the path now and then
+                if (z % 24 == 12) {
                     int x = (z / 12) % 2 == 0 ? 0 : width - 1;
                     b.fill(x, 1, z, x, 2, z, FENCE);
                     b.set(x, 3, z, Blocks.LANTERN.defaultBlockState());
@@ -160,11 +183,21 @@ final class Buildings {
                     }
                 }
             }
-            if (z % 12 == 6) {
+            if (z % 24 == 12) {
                 int x = (z / 12) % 2 == 0 ? 0 : width - 1;
                 b.set(x, 1, z, FENCE);
                 b.set(x, 2, z, FENCE);
                 b.set(x, 3, z, Blocks.LANTERN.defaultBlockState());
+            }
+            // barnacles crusting the posts at the waterline
+            if (z % 4 == 0 && overWater && b.chance(0, -1, z, 10, 0.5F)) {
+                b.set(0, -1, z, Blocks.DEAD_TUBE_CORAL_BLOCK.defaultBlockState());
+            }
+        }
+        // the side piers end in a row of empty chairs looking out to sea
+        if (pier && piece.facing != piece.seaward) {
+            for (int x = 0; x < width; x++) {
+                b.set(x, 1, length - 2, chair(b, piece.seaward));
             }
         }
     }
@@ -180,7 +213,7 @@ final class Buildings {
 
     // ------------------------------------------------------------------ gate (牌坊)
 
-    private static void gate(Builder b) {
+    private static void gate(TownPiece piece, Builder b) {
         b.clear(0, 1, 0, 10, 10, 2);
         for (int x : new int[]{2, 8}) {
             b.fill(x - 1, 0, 0, x + 1, 0, 2, Blocks.MOSSY_COBBLESTONE.defaultBlockState());
@@ -209,21 +242,35 @@ final class Buildings {
         b.set(7, 6, 1, hangingLantern());
         vine(b, 2, 6, 0, Direction.SOUTH, 3);
         vine(b, 8, 5, 2, Direction.NORTH, 4);
+        // two paper figures wait outside the gate, facing whoever comes along the road
+        Direction outwards = piece.facing.getOpposite();
+        piece.effigy(b, 0, 0, -2, outwards);
+        piece.effigy(b, 10, 0, -2, outwards);
     }
 
     // ------------------------------------------------------------------ houses (吊脚楼)
 
-    private static void house(TownPiece piece, Builder b) {
-        boolean collapsed = b.rand(0, 0, 0, 10) < 0.25F;
+    private static void house(TownPiece piece, Builder street) {
+        boolean collapsed = street.rand(0, 0, 0, 10) < 0.25F;
+        // many have settled into the mud, a block or two below the street
+        float sinking = street.rand(0, 0, 0, 14);
+        Builder b = street.shifted(sinking < 0.35F ? -1 : sinking < 0.5F ? -2 : 0);
         shack(b, 7, 7, 4, collapsed);
-        // inside: a barrel, a chest, candles, a lantern under the tie beam, cobweb nets in the corners
+        // inside: a barrel, a chest, candles, cobweb nets in the corners, and chairs all turned to the sea
         b.set(1, 1, 1, Blocks.BARREL.defaultBlockState().setValue(BarrelBlock.FACING, Direction.UP));
         b.set(1, 2, 1, candles(b, 1, 2, 1));
         chest(b, 5, 1, 1, Direction.SOUTH, HOUSE_LOOT);
         b.set(5, 1, 3, Blocks.CAULDRON.defaultBlockState());
-        b.set(3, 4, 3, hangingLantern());
+        b.set(2, 1, 4, chair(b, piece.seaward));
+        b.set(4, 1, 4, chair(b, piece.seaward));
+        if (b.chance(0, 0, 0, 15, 0.5F)) {
+            b.set(3, 4, 3, hangingLantern());
+        }
         b.set(1, 4, 5, COBWEB);
         b.set(5, 4, 1, COBWEB);
+        if (b.chance(0, 0, 0, 16, 0.2F)) {
+            piece.effigy(b, 5, 1, 7, piece.facing); // a paper figure keeping watch on the porch
+        }
         if (!collapsed) {
             TownRole role = HOUSE_ROLES[(int) (b.rand(0, 0, 0, 11) * HOUSE_ROLES.length)];
             piece.spawn(b, 3, 1, 4, role);
@@ -254,7 +301,7 @@ final class Buildings {
                 if (x != door && b.chance(x, 0, z, 20, 0.05F)) {
                     continue;
                 }
-                b.set(x, 0, z, b.chance(x, 0, z, 21, 0.7F) ? DARK_PLANKS : SPRUCE_PLANKS);
+                b.set(x, 0, z, deck(b, x, 0, z));
                 if (b.chance(x, 1, z, 22, 0.1F)) {
                     b.set(x, 1, z, MOSS);
                 }
@@ -262,7 +309,7 @@ final class Buildings {
         }
         // porch
         for (int x = 1; x < w - 1; x++) {
-            b.set(x, 0, d, SPRUCE_PLANKS);
+            b.set(x, 0, d, deck(b, x, 0, d));
         }
         b.set(1, 1, d, FENCE);
         b.set(w - 2, 1, d, FENCE);
@@ -297,8 +344,15 @@ final class Buildings {
         for (int[] wnd : windows) {
             b.set(wnd[0], wnd[1], wnd[2], b.chance(wnd[0], 2, wnd[2], 26, 0.3F) ? COBWEB : AIR);
         }
-        // door (sometimes gone)
-        if (b.chance(0, 0, 0, 27, 0.8F)) {
+        // door: sometimes boarded up from outside, sometimes gone
+        float doorKind = b.rand(0, 0, 0, 27);
+        if (doorKind < 0.25F) {
+            b.set(door, 1, d - 1, log(Direction.Axis.X));
+            b.set(door, 2, d - 1, AIR);
+            b.set(door, 3, d - 1, log(Direction.Axis.X));
+            b.set(door, 2, d - 1, Blocks.DARK_OAK_TRAPDOOR.defaultBlockState()
+                    .setValue(TrapDoorBlock.FACING, Direction.SOUTH).setValue(TrapDoorBlock.OPEN, true));
+        } else if (doorKind < 0.85F) {
             BlockState doorState = Blocks.SPRUCE_DOOR.defaultBlockState().setValue(DoorBlock.FACING, Direction.SOUTH)
                     .setValue(DoorBlock.HINGE, DoorHingeSide.LEFT);
             b.set(door, 1, d - 1, doorState.setValue(DoorBlock.HALF, DoubleBlockHalf.LOWER));
@@ -306,6 +360,29 @@ final class Buildings {
         } else {
             b.set(door, 1, d - 1, AIR);
             b.set(door, 2, d - 1, AIR);
+        }
+        // barnacles clustered on the outside walls below the tide line
+        for (int z = 0; z < d; z++) {
+            for (int y = 0; y <= 2; y++) {
+                if (b.chance(-1, y, z, 37, 0.12F) && b.get(-1, y, z).isAir()) {
+                    b.set(-1, y, z, Blocks.DEAD_BRAIN_CORAL_WALL_FAN.defaultBlockState()
+                            .setValue(BaseCoralWallFanBlock.FACING, Direction.WEST));
+                }
+                if (b.chance(w, y, z, 38, 0.12F) && b.get(w, y, z).isAir()) {
+                    b.set(w, y, z, Blocks.DEAD_BRAIN_CORAL_WALL_FAN.defaultBlockState()
+                            .setValue(BaseCoralWallFanBlock.FACING, Direction.EAST));
+                }
+            }
+        }
+        // now and then someone has scratched an eye into the outside of a wall
+        if (b.chance(0, 0, 0, 39, 0.2F)) {
+            BlockState button = BUTTON.setValue(ButtonBlock.FACING, Direction.EAST);
+            int[][] eye = {{3, 2}, {3, 3}, {3, 4}, {2, 1}, {2, 3}, {2, 5}, {1, 2}, {1, 3}, {1, 4}};
+            for (int[] e : eye) {
+                if (b.get(w, e[0], e[1]).isAir()) {
+                    b.set(w, e[0], e[1], button);
+                }
+            }
         }
         // tie beam to hang a lantern from
         for (int x = 0; x < w; x++) {
@@ -409,7 +486,7 @@ final class Buildings {
         b.clear(-1, 1, -1, w, 5, d);
         for (int x = 0; x < w; x++) {
             for (int z = 0; z < d; z++) {
-                b.set(x, 0, z, b.chance(x, 0, z, 50, 0.5F) ? SPRUCE_PLANKS : DARK_PLANKS);
+                b.set(x, 0, z, deck(b, x, 0, z));
             }
         }
         for (int x : new int[]{0, 4, 8}) {
@@ -607,14 +684,15 @@ final class Buildings {
         for (int i = 0; i < tentacles; i++) {
             double angle = Math.PI * 2 * i / tentacles + b.rand(i, 0, 0, 80) * 0.5;
             double curl = (b.rand(i, 0, 0, 81) - 0.5) * 2.0;
-            double reach = 6.0 + b.rand(i, 0, 0, 82) * 4.0;
+            double reach = 3.5 + b.rand(i, 0, 0, 82) * 3.0;
             for (double t = 0.0; t <= 1.0; t += 0.03) {
                 double a = angle + curl * t * t * 2.5;
                 double r = 1.5 + reach * t;
                 int x = Mth.floor(cx + Math.cos(a) * r);
                 int z = Mth.floor(cz + Math.sin(a) * r * 0.8);
                 int y = Mth.floor(4.0 + 3.0 * Math.sin(Math.PI * t * 0.9) - 3.5 * t);
-                if (x < 4 || x > 16 || z < 3 || z > 19 || y < 1) {
+                // stay inside the hall and keep the aisle up to the offerings clear
+                if (x < 4 || x > 16 || z < 3 || z > 15 || y < 1 || z > 10 && Math.abs(x - 10) <= 2) {
                     continue;
                 }
                 b.set(x, y, z, b.chance(x, y, z, 83, 0.06F) ? eye : b.chance(x, y, z, 84, 0.2F) ? sucker : flesh);
