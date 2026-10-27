@@ -246,17 +246,19 @@ final class Buildings {
         vine(b, 8, 5, 2, Direction.NORTH, 4);
         // two paper figures wait outside the gate, facing whoever comes along the road
         Direction outwards = piece.facing.getOpposite();
-        piece.effigy(b, 0, 0, -2, outwards);
-        piece.effigy(b, 10, 0, -2, outwards);
+        for (int x : new int[]{0, 10}) {
+            b.set(x, 0, -2, Blocks.MOSSY_COBBLESTONE.defaultBlockState()); // each on a little plinth by the road
+            piece.effigy(b, x, 1, -2, outwards);
+        }
     }
 
     // ------------------------------------------------------------------ houses (吊脚楼)
 
     private static void house(TownPiece piece, Builder street) {
         boolean collapsed = street.rand(0, 0, 0, 10) < 0.25F;
-        // many have settled into the mud, a block or two below the street
+        // many have settled into the mud, a block below the street
         float sinking = street.rand(0, 0, 0, 14);
-        Builder b = street.shifted(sinking < 0.35F ? -1 : sinking < 0.5F ? -2 : 0);
+        Builder b = street.shifted(sinking < 0.45F ? -1 : 0);
         shack(b, 7, 7, 4, collapsed);
         // inside: a barrel, a chest, candles, cobweb nets in the corners, and chairs all turned to the sea
         b.set(1, 1, 1, Blocks.BARREL.defaultBlockState().setValue(BarrelBlock.FACING, Direction.UP));
@@ -275,9 +277,10 @@ final class Buildings {
         }
         if (!collapsed) {
             TownRole role = HOUSE_ROLES[(int) (b.rand(0, 0, 0, 11) * HOUSE_ROLES.length)];
-            piece.spawn(b, 3, 1, 4, role);
+            // they live at the back of the room, out of the doorway
+            piece.spawn(b, 3, 1, 2, role);
             if (b.rand(0, 0, 0, 12) < 0.4F) {
-                piece.spawn(b, 2, 1, 3, HOUSE_ROLES[(int) (b.rand(0, 0, 0, 13) * HOUSE_ROLES.length)]);
+                piece.spawn(b, 2, 1, 2, HOUSE_ROLES[(int) (b.rand(0, 0, 0, 13) * HOUSE_ROLES.length)]);
             }
         }
     }
@@ -346,14 +349,14 @@ final class Buildings {
         for (int[] wnd : windows) {
             b.set(wnd[0], wnd[1], wnd[2], b.chance(wnd[0], 2, wnd[2], 26, 0.3F) ? COBWEB : AIR);
         }
-        // door: sometimes boarded up from outside, sometimes gone
+        // door: sometimes torn off with a board still nailed across the top, sometimes gone; always a way in
         float doorKind = b.rand(0, 0, 0, 27);
         if (doorKind < 0.25F) {
-            b.set(door, 1, d - 1, log(Direction.Axis.X));
-            b.set(door, 2, d - 1, AIR);
-            b.set(door, 3, d - 1, log(Direction.Axis.X));
+            b.set(door, 1, d - 1, AIR);
+            // the last board hangs down the side of the doorway, out of the way
             b.set(door, 2, d - 1, Blocks.DARK_OAK_TRAPDOOR.defaultBlockState()
-                    .setValue(TrapDoorBlock.FACING, Direction.SOUTH).setValue(TrapDoorBlock.OPEN, true));
+                    .setValue(TrapDoorBlock.FACING, Direction.EAST).setValue(TrapDoorBlock.OPEN, true));
+            b.set(door, 3, d - 1, log(Direction.Axis.X));
         } else if (doorKind < 0.85F) {
             BlockState doorState = Blocks.SPRUCE_DOOR.defaultBlockState().setValue(DoorBlock.FACING, Direction.SOUTH)
                     .setValue(DoorBlock.HINGE, DoorHingeSide.LEFT);

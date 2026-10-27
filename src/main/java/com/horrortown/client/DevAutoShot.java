@@ -41,8 +41,7 @@ public final class DevAutoShot {
     /** A fog value that means: raise the Tide Mother out at sea in front of the town, held mid-slam. */
     private static final float MOTHER = -3.0F;
     private static final float[][] SHOTS = {
-            {6000, MOTHER, 1000, 0, 0, 0, 0, 0},
-            {6000, MOTHER, 1001, 0, 0, 0, 0, 0},
+            {18000, -1.0F, 0, 4, 10, 0, 2, 80},
     };
 
     private static int ticks;

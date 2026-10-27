@@ -95,5 +95,7 @@
   "message.horror_town.offering.no_idol": "须在庙里的潮母像前献上。",
   "message.horror_town.offering.day": "白天，她不应。",
   "message.horror_town.offering.risen": "她已经上来了。",
-  "message.horror_town.offering.answered": "海里有东西应了。"
+  "message.horror_town.offering.answered": "海里有东西应了。",
+  "item.horror_town.mud_boots": "泥靴",
+  "enchantment.horror_town.mud_walker": "泥上行者"
 }

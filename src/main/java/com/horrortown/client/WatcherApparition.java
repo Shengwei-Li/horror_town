@@ -29,7 +29,7 @@ public final class WatcherApparition {
     private static final double DISTANCE = 75.0;
     private static final double SUNK = 1.5;
     private static final double RISE = 24.0;
-    private static final float RISE_TICKS = 600.0F;
+    private static final float RISE_TICKS = 200.0F;
     /** If you move this far along the coast, it reappears off the new stretch. */
     private static final double FOLLOW = 70.0;
     private static final double SIDEWAYS = Math.toRadians(40.0);

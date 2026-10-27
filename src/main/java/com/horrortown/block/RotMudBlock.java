@@ -1,5 +1,6 @@
 package com.horrortown.block;
 
+import com.horrortown.registry.ModGear;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -7,6 +8,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -18,8 +20,8 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
- * 腐泥: black, rotten mud. You sink half a block into it and wade through it slowly; now and then it
- * lets out a bubble of gas.
+ * 腐泥: black, rotten mud. You sink half a block into it and wade through it slowly, unless you have mud boots
+ * on (or boots with Mud Walker); now and then it lets out a bubble of gas.
  */
 public class RotMudBlock extends Block {
     public static final MapCodec<RotMudBlock> CODEC = simpleCodec(RotMudBlock::new);
@@ -62,7 +64,8 @@ public class RotMudBlock extends Block {
 
     @Override
     protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
-        if (!entity.isSpectator() && !(entity.isPassenger()) && entity.getY() < pos.getY() + 0.75) {
+        if (!entity.isSpectator() && !(entity.isPassenger()) && entity.getY() < pos.getY() + 0.75
+                && !(entity instanceof LivingEntity living && ModGear.walksOnMud(living))) {
             entity.makeStuckInBlock(state, STUCK);
         }
     }

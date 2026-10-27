@@ -95,5 +95,7 @@
   "message.horror_town.offering.no_idol": "It has to be offered before the idol in the temple.",
   "message.horror_town.offering.day": "By day, she does not answer.",
   "message.horror_town.offering.risen": "She is already here.",
-  "message.horror_town.offering.answered": "Something in the sea has answered."
+  "message.horror_town.offering.answered": "Something in the sea has answered.",
+  "item.horror_town.mud_boots": "Mud Boots",
+  "enchantment.horror_town.mud_walker": "Mud Walker"
 }

@@ -119,6 +119,14 @@ public final class WorldEvents {
         }
         TideNight tide = TideNight.get(world);
         if (start) {
+            long time = world.getDayTime() % 24000L;
+            if (time < 13000L || time >= 23000L) {
+                // a tide only runs at night, so one started by day brings the night with it
+                long dusk = world.getDayTime() - time + (time >= 23000L ? 24000L : 0L) + 13000L;
+                for (ServerLevel level : world.getServer().getAllLevels()) {
+                    level.setDayTime(dusk);
+                }
+            }
             tide.start(world);
         } else {
             tide.end(world, world.getDayTime() / 24000L);
