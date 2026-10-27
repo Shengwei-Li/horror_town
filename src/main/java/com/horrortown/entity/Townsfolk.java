@@ -39,6 +39,13 @@ import org.jetbrains.annotations.Nullable;
 import com.mojang.logging.LogUtils;
 import org.slf4j.Logger;
 
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.animation.RawAnimation;
+import software.bernie.geckolib.util.GeckoLibUtil;
+
 import java.util.EnumSet;
 
 /**
@@ -47,10 +54,14 @@ import java.util.EnumSet;
  * pale and glassy-eyed at first, then gills and scales, until they hardly speak at all ({@link #stage()}).
  * Walk into their temple and every one of them stops to stare at you.
  */
-public class Townsfolk extends PathfinderMob implements Merchant {
+public class Townsfolk extends PathfinderMob implements Merchant, GeoEntity {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final EntityDataAccessor<Integer> ROLE =
             SynchedEntityData.defineId(Townsfolk.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Boolean> STARING =
+            SynchedEntityData.defineId(Townsfolk.class, EntityDataSerializers.BOOLEAN);
+    private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.townsfolk.idle");
+    private static final RawAnimation WALK = RawAnimation.begin().thenLoop("animation.townsfolk.walk");
     /** Days into the world when they turn: stage 1 (gills, scales) and stage 2 (fish-eyed, mute). */
     public static final long STAGE_1_DAY = 10;
     public static final long STAGE_2_DAY = 30;
@@ -72,6 +83,7 @@ public class Townsfolk extends PathfinderMob implements Merchant {
     @Nullable
     private Player stareTarget;
     private int stareTicks;
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     public Townsfolk(EntityType<? extends Townsfolk> type, Level level) {
         super(type, level);
@@ -110,6 +122,7 @@ public class Townsfolk extends PathfinderMob implements Merchant {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(ROLE, 0);
+        builder.define(STARING, false);
     }
 
     @Override
@@ -144,6 +157,7 @@ public class Townsfolk extends PathfinderMob implements Merchant {
         if (this.stareTicks > 0) {
             this.stareTicks--;
         }
+        this.entityData.set(STARING, this.stareTicks > 0 || this.tradingPlayer != null);
         if (this.tickCount % 20 == 0 && this.level() instanceof ServerLevel level) {
             Player player = level.getNearestPlayer(this, 48.0);
             if (player != null && !player.isSpectator() && TownStructure.inTemple(level, player.blockPosition())) {
@@ -161,6 +175,22 @@ public class Townsfolk extends PathfinderMob implements Merchant {
     private boolean isNight() {
         long time = this.level().getDayTime() % 24000L;
         return time >= 12500L && time < 23500L;
+    }
+
+    /** Staring at a trespasser or a customer: the head tilts over (see TownsfolkRenderer). */
+    public boolean isStaring() {
+        return this.entityData.get(STARING);
+    }
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(this, "move", 5,
+                state -> state.setAndContinue(state.isMoving() ? WALK : IDLE)));
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return this.cache;
     }
 
     // ------------------------------------------------------------------ talking and trading

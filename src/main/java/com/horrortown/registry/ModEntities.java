@@ -15,8 +15,8 @@ public final class ModEntities {
 
     public static final DeferredHolder<EntityType<?>, EntityType<Townsfolk>> TOWNSFOLK = ENTITIES.register("townsfolk",
             () -> EntityType.Builder.of(Townsfolk::new, MobCategory.MISC)
-                    .sized(0.6F, 1.95F)
-                    .eyeHeight(1.62F)
+                    .sized(0.6F, 2.4F)
+                    .eyeHeight(2.15F)
                     .clientTrackingRange(10)
                     .build("townsfolk"));
 
