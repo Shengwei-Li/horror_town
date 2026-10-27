@@ -42,9 +42,9 @@ public final class ModEntities {
     /** 潮母真身: the boss, called up out of the sea by an offering at the idol. */
     public static final DeferredHolder<EntityType<?>, EntityType<TideMotherTrue>> TIDE_MOTHER_TRUE = ENTITIES.register(
             "tide_mother_true", () -> EntityType.Builder.<TideMotherTrue>of(TideMotherTrue::new, MobCategory.MONSTER)
-                    .sized(3.5F, 10.0F)
-                    .eyeHeight(9.0F)
-                    .clientTrackingRange(16)
+                    .sized(10.0F, 42.0F)
+                    .eyeHeight(36.0F)
+                    .clientTrackingRange(20)
                     .fireImmune()
                     .build("tide_mother_true"));
 

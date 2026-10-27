@@ -1,8 +1,9 @@
 """潮母真身, the Tide Mother's true body: the boss model, its drops' icons and the tide-scale armour textures.
 
 Usage: python tools/gen_boss.py <vanilla texture dir with diamond_layer_1/2.png and diamond_*.png item icons>
-The model is drawn at a third of its size and rendered three times as big: about ten blocks of bloated, robed,
-grey flesh with a grinning skull of a face behind long wet hair, arms that hang to the ground. Front is -Z.
+The model is drawn at an eighth of its size and rendered eight times as big: forty blocks of her standing in the
+shallows on a mass of tentacles. Her arm poses are solved against the model itself, and the slams' landing points
+printed at the end go into TideMotherTrue.SLAMS. Front is -Z.
 """
 import json
 import math
@@ -17,82 +18,161 @@ from gen_mobs import (ROOT, TAU, Model, blotched, flat, frames, glowing, icon, l
 VTEX = Path(sys.argv[1])
 
 
+SCALE = 8  # the model is drawn at an eighth of its size: one unit is half a block
+WATER = 8  # where her hands come down: four blocks above the sea floor she stands on
+REACHES = (16, 28, 40)  # how far in front of her (blocks) each of her three slams lands
+SHOULDER_X = 15
+
+
+def fingertip(m, deltas):
+    """Where the right hand's middle finger ends (mirrored model units) with these extra arm rotations."""
+    from render_models import apply, mat_mul, rotation_about, translate
+    bones = {b["name"]: b for b in m.bones}
+    cache = {}
+
+    def world(name):
+        if name not in cache:
+            b = bones[name]
+            mat = world(b["parent"]) if "parent" in b else translate(0, 0, 0)
+            r = [a + d for a, d in zip(b.get("rotation", [0, 0, 0]), deltas.get(name, (0, 0, 0)))]
+            cache[name] = mat_mul(mat, rotation_about(b["pivot"], r))
+        return cache[name]
+    return apply(world("right_hand"), (SHOULDER_X, -52, 0))
+
+
+def solve(m, forward, up, upper=(-200, 80), lower=(-170, 170)):
+    """Extra X rotations of the right upper arm and forearm that put its fingertip `forward` units in front of
+    her (towards -Z) and `up` units high, in the plane of the shoulder."""
+    best = None
+    for coarse in (True, False):
+        ur = range(upper[0], upper[1] + 1, 3) if coarse else range(best[1] - 3, best[1] + 4)
+        lr = range(lower[0], lower[1] + 1, 3) if coarse else range(best[2] - 3, best[2] + 4)
+        for a in ur:
+            for b in lr:
+                x, y, z = fingertip(m, {"right_arm": (a, 0, 0), "right_forearm": (b, 0, 0)})
+                err = (-z - forward) ** 2 + (y - up) ** 2 + (0.02 * abs(b)) ** 2  # straighter arms win ties
+                if best is None or err < best[0]:
+                    best = (err, a, b)
+    return best[1], best[2]
+
+
 def tide_mother_true():
-    m = Model("tide_mother_true", 256)
+    """Forty blocks of her standing in the shallows: a mass of tentacles where legs should be, a rotting robe over
+    a bloated grey body, a grinning skull of a face with two red eyes behind long wet hair, and arms nearly sixty
+    blocks long that rest bent on the water in front of her."""
+    m = Model("tide_mother_true", 512)
     skin = blotched((150, 158, 160), (118, 126, 130), 0.18)
     belly_skin = blotched((168, 172, 170), (132, 120, 124), 0.12)
     robe = blotched((52, 58, 52), (34, 40, 36), 0.25)
     hair = striped((16, 20, 18), (30, 36, 32), 1)
     barnacle = blotched((176, 170, 150), (120, 116, 100), 0.3)
+    tentacle = blotched((92, 104, 104), (60, 70, 72), 0.25)
+    sucker = blotched((150, 120, 120), (110, 86, 88), 0.3)
     bone = flat((214, 208, 190), 6)
     face = sheet(([
-        "..........",
-        "..........",
-        ".kkk..kkk.",
-        ".kgk..kgk.",
-        ".kkk..kkk.",
-        "....kk....",
-        "..........",
-        "..........",
-        "wkwkwkwkwk",
-        "kwkwkwkwkw"], {"k": (14, 12, 12), "g": (210, 220, 196, True), "w": (214, 208, 190)}, bone))
-    jaw_face = sheet((["wkwkwkwk", "kkkkkkkk"], {"w": (214, 208, 190), "k": (24, 10, 12)}, bone))
+        "..............",
+        "..............",
+        ".kkkk....kkkk.",
+        ".kkrrk..krrkk.",
+        ".kkrrk..krrkk.",
+        ".kkkk....kkkk.",
+        "......kk......",
+        "......kk......",
+        "..............",
+        "..............",
+        "..............",
+        "wkwkwkwkwkwkwk",
+        "kwkwkwkwkwkwkw",
+        ".kkkkkkkkkkkk."], {"k": (14, 12, 12), "r": (230, 30, 26, True), "w": (214, 208, 190)}, bone))
+    jaw_face = sheet((["wkwkwkwkwkw", "kkkkkkkkkkk", "kkkkkkkkkkk"], {"w": (214, 208, 190), "k": (24, 10, 12)}, bone))
 
-    m.bone("body", "root", [0, 16, 0], [
-        ([-11, 0, -9], [22, 10, 18], robe), ([-10, 10, -9.5], [20, 8, 18], robe),
-        ([-12, 0, -10], [2, 4, 1], robe), ([3, 0, -10], [3, 3, 1], robe), ([9, 0, 8.5], [3, 5, 1], robe)])
-    m.bone("belly", "body", [0, 24, -2], [
-        ([-10, 17, -12], [20, 15, 19], with_front(skin, belly_skin)), ([-8, 19, -14], [16, 11, 2], belly_skin),
-        ([-11, 22, -6], [2, 3, 3], barnacle), ([9, 20, -3], [2, 4, 4], barnacle), ([-4, 18, -14.5], [3, 2, 1], barnacle)])
-    m.bone("chest", "body", [0, 32, 0], [
-        ([-8, 32, -6], [16, 10, 10], skin), ([-10, 38, -5], [20, 4, 9], skin), ([4, 33, -6.5], [3, 2, 1], barnacle)],
-        rotation=[12, 0, 0])
-    m.bone("neck", "chest", [0, 42, -1], rotation=[-8, 0, 0])
-    m.bone("head", "neck", [0, 42, -1], [
-        ([-5, 44, -7], [10, 10, 10], with_front(bone, face)),
-        ([-5.5, 53.5, -7.5], [11, 2, 11], hair),            # crown of hair
-        ([-6, 24, 2.5], [12, 30, 2], hair),                 # down the back
-        ([-6.5, 26, -7], [1.5, 28, 9], hair), ([5, 26, -7], [1.5, 28, 9], hair),  # either side
-        ([-5.5, 30, -7.6], [2, 24, 1], hair), ([3.5, 28, -7.6], [2, 26, 1], hair),  # strands over the face
-        ([-1.5, 34, -7.7], [1, 15, 1], hair)])
-    m.bone("jaw", "head", [0, 44, -2], [([-4, 40.5, -6.5], [8, 3.5, 7.5], with_front(bone, jaw_face))])
+    # the tentacles she stands on, eight of them curling out across the sea floor
+    m.bone("body", "root", [0, 20, 0], [([-12, 14, -12], [24, 10, 24], robe)])
+    for k in range(8):
+        a = k * 45 + 22.5
+        m.bone(f"tentacle_{k}_0", "body", [0, 18, 0], [([-2.5, 4, -2.5], [5, 14, 5], with_front(tentacle, sucker))],
+               rotation=[42, a, 0])
+        m.bone(f"tentacle_{k}_1", f"tentacle_{k}_0", [0, 4, 0], [([-2, -8, -2], [4, 12, 4], with_front(tentacle, sucker))],
+               rotation=[32, 0, 0])
+        m.bone(f"tentacle_{k}_2", f"tentacle_{k}_1", [0, -8, 0], [([-1.5, -18, -1.5], [3, 10, 3], tentacle)],
+               rotation=[30, 0, 0])
+    m.bone("robe", "body", [0, 20, 0], [([-14, 22, -13], [28, 12, 26], robe), ([-15, 18, -6], [2, 8, 2], robe),
+                                        ([10, 17, 9], [3, 9, 2], robe), ([-4, 16, -14], [4, 8, 2], robe)])
+    m.bone("belly", "body", [0, 40, -2], [
+        ([-13, 34, -14], [26, 16, 24], with_front(skin, belly_skin)), ([-11, 36, -16], [22, 12, 2], belly_skin),
+        ([-14, 40, -6], [2, 4, 4], barnacle), ([12, 38, -2], [2, 5, 5], barnacle), ([-5, 35, -16.5], [4, 3, 1], barnacle)])
+    m.bone("chest", "body", [0, 50, 0], [([-10, 50, -8], [20, 12, 14], skin), ([-15, 58, -7], [30, 5, 12], skin),
+                                         ([5, 52, -8.5], [4, 3, 1], barnacle)], rotation=[10, 0, 0])
+    m.bone("neck", "chest", [0, 63, -2], rotation=[-6, 0, 0])
+    m.bone("head", "neck", [0, 63, -2], [
+        ([-7, 63, -9], [14, 14, 14], with_front(bone, face)),
+        ([-7.5, 76.5, -9.5], [15, 2, 15], hair),
+        ([-8, 36, 4.5], [16, 41, 2], hair),
+        ([-8.5, 40, -9], [1.5, 37, 13.5], hair), ([7, 40, -9], [1.5, 37, 13.5], hair),
+        ([-7.5, 42, -9.6], [2.5, 35, 1], hair), ([5, 40, -9.6], [2.5, 37, 1], hair), ([-2, 46, -9.7], [1.5, 17, 1], hair)])
+    m.bone("jaw", "head", [0, 63, -3], [([-5.5, 59.5, -8.5], [11, 3.5, 10], with_front(bone, jaw_face))])
     for side, sign in (("right", -1), ("left", 1)):
-        x = sign * 13
-        m.bone(f"{side}_arm", "chest", [x, 40, 0], [([x - 2, 21, -2], [4, 19, 4], skin),
-                                                    ([x - 2.5, 36, -2.5], [5, 4, 5], barnacle if sign > 0 else skin)],
-               rotation=[-14, 0, sign * 22])
-        m.bone(f"{side}_forearm", f"{side}_arm", [x, 22, 0], [([x - 1.5, 5, -1.5], [3, 17, 3], skin),
-                                                              ([x - 2.5, 1, -2.5], [5, 4, 5], skin)],
-               rotation=[-10, 0, sign * -14])
-        for k, dz in enumerate((-2, 0, 2)):
-            m.bone(f"{side}_finger_{k}", f"{side}_forearm", [x, 1.5, dz], [([x - 0.5, -6, dz - 0.5], [1, 7.5, 1], skin)],
-                   rotation=[(k - 1) * -12, 0, 0])
+        x = sign * SHOULDER_X
+        m.bone(f"{side}_arm", "chest", [x, 60, 0], [([x - 2.5, 10, -2.5], [5, 50, 5], skin),
+                                                    ([x - 3, 54, -3], [6, 4, 6], barnacle if sign > 0 else skin)])
+        m.bone(f"{side}_forearm", f"{side}_arm", [x, 10, 0], [([x - 2, -40, -2], [4, 50, 4], skin)])
+        m.bone(f"{side}_hand", f"{side}_forearm", [x, -40, 0], [([x - 3, -46, -3], [6, 6, 6], skin)]
+               + [([x - 0.5 + dx, -58, -0.5 + dz], [1, 12, 1], skin) for dx, dz in ((-2, -2), (0, -2.5), (2, -2), (0, 2))])
+
+    # the rest pose, worked out so her hands lie on the water a little way in front of her
+    rest_u, rest_l = solve(m, 46, WATER)
+    for side in ("right", "left"):
+        next(b for b in m.bones if b["name"] == f"{side}_arm")["rotation"] = [rest_u, 0, 0]
+        next(b for b in m.bones if b["name"] == f"{side}_forearm")["rotation"] = [rest_l, 0, 0]
+    # sanity: the solver is only as good as the geometry it was handed
+    print("rest fingertip", [round(v / 2, 1) for v in fingertip(m, {})])
+
+    def writhe(length, amplitude, speed=1):
+        bones = {}
+        for k in range(8):
+            for s in range(3):
+                bones[f"tentacle_{k}_{s}"] = swing(length, amplitude * (0.6 + 0.4 * s), k * 0.8 + s * 0.9, axis=0 if s else 2)
+        return bones
 
     def arms(length, a, ph=0.0):
-        return {"right_arm": swing(length, a, ph), "left_arm": swing(length, a, ph + math.pi)}
+        return {"right_arm": swing(length, a, ph), "left_arm": swing(length, a, ph + math.pi),
+                "right_forearm": swing(length, a, ph + 1.0), "left_forearm": swing(length, a, ph + 1.0 + math.pi)}
 
-    idle = {"belly": {"scale": frames(4.0, 8, lambda t: (1 + 0.03 * math.sin(TAU * t),) * 3)},
-            "head": swing(4.0, 3, 0.0, axis=2), "jaw": swing(4.0, 4, 1.0), **arms(4.0, 3)}
-    walk = {"body": {"rotation": frames(2.4, 8, lambda t: (0, 0, 3 * math.sin(TAU * t))),
-                     "position": frames(2.4, 8, lambda t: (0, 0.6 * abs(math.sin(TAU * t)), 0))},
-            "head": swing(2.4, 4, 1.0, axis=2), **arms(2.4, 14)}
-    slam = {"loop": False, "animation_length": 1.2, "bones": {
-        "right_arm": {"rotation": {"0.0": [0, 0, 0], "0.5": [-150, 0, 10], "0.7": [-20, 0, 0], "1.2": [0, 0, 0]}},
-        "left_arm": {"rotation": {"0.0": [0, 0, 0], "0.5": [-150, 0, -10], "0.7": [-20, 0, 0], "1.2": [0, 0, 0]}},
-        "chest": {"rotation": {"0.0": [0, 0, 0], "0.5": [-12, 0, 0], "0.7": [18, 0, 0], "1.2": [0, 0, 0]}}}}
-    roar = {"loop": False, "animation_length": 2.0, "bones": {
-        "head": {"rotation": {"0.0": [0, 0, 0], "0.4": [-28, 0, 0], "1.6": [-24, 0, 0], "2.0": [0, 0, 0]}},
-        "jaw": {"rotation": {"0.0": [0, 0, 0], "0.4": [40, 0, 0], "1.6": [40, 0, 0], "2.0": [0, 0, 0]}},
-        "right_arm": {"rotation": {"0.0": [0, 0, 0], "0.5": [-40, 0, 50], "1.6": [-40, 0, 50], "2.0": [0, 0, 0]}},
-        "left_arm": {"rotation": {"0.0": [0, 0, 0], "0.5": [-40, 0, -50], "1.6": [-40, 0, -50], "2.0": [0, 0, 0]}}}}
-    rise = {"loop": False, "animation_length": 4.0, "bones": {
-        "root": {"position": {"0.0": [0, -60, 0], "3.0": [0, -6, 0], "4.0": [0, 0, 0]}},
-        "head": {"rotation": {"0.0": [30, 0, 0], "3.0": [10, 0, 0], "4.0": [0, 0, 0]}}}}
-    death = {"loop": "hold_on_last_frame", "animation_length": 3.0, "bones": {
-        "root": {"position": {"0.0": [0, 0, 0], "3.0": [0, -62, 0]}, "rotation": {"0.0": [0, 0, 0], "3.0": [0, 0, 14]}},
-        "head": {"rotation": {"0.0": [0, 0, 0], "0.6": [-30, 0, 0], "3.0": [-30, 0, 0]}},
-        "jaw": {"rotation": {"0.0": [0, 0, 0], "0.6": [40, 0, 0], "3.0": [40, 0, 0]}}}}
-    m.save({"idle": loop(4.0, idle), "walk": loop(2.4, walk), "slam": slam, "roar": roar, "rise": rise, "death": death})
+    breathe = {"belly": {"scale": frames(5.0, 8, lambda t: (1 + 0.03 * math.sin(TAU * t),) * 3)}}
+    idle = {**writhe(5.0, 10), **breathe, "head": swing(5.0, 3, 0.0, axis=2), "jaw": swing(5.0, 4, 1.0), **arms(5.0, 3)}
+    walk = {**writhe(3.0, 16), **breathe, "body": swing(3.0, 3, 0.0, axis=2), "head": swing(3.0, 4, 1.0, axis=2),
+            **arms(3.0, 5)}
+    lash = {"loop": False, "animation_length": 1.4, "bones": {
+        f"tentacle_{k}_{s}": {"rotation": {"0.0": [0, 0, 0], "0.3": [-35 - 10 * s, 0, 0], "0.6": [40 + 10 * s, 0, 0],
+                                           "0.9": [-20, 0, 0], "1.4": [0, 0, 0]}}
+        for k in range(8) for s in range(3)}}
+    roar = {"loop": False, "animation_length": 2.5, "bones": {
+        "head": {"rotation": {"0.0": [0, 0, 0], "0.5": [-30, 0, 0], "2.0": [-26, 0, 0], "2.5": [0, 0, 0]}},
+        "jaw": {"rotation": {"0.0": [0, 0, 0], "0.5": [45, 0, 0], "2.0": [45, 0, 0], "2.5": [0, 0, 0]}},
+        "chest": {"rotation": {"0.0": [0, 0, 0], "0.5": [-10, 0, 0], "2.0": [-10, 0, 0], "2.5": [0, 0, 0]}}}}
+    rise = {"loop": False, "animation_length": 6.0, "bones": {
+        "root": {"position": {"0.0": [0, -90, 0], "5.0": [0, -6, 0], "6.0": [0, 0, 0]}},
+        "head": {"rotation": {"0.0": [35, 0, 0], "5.0": [10, 0, 0], "6.0": [0, 0, 0]}}}}
+    death = {"loop": "hold_on_last_frame", "animation_length": 4.0, "bones": {
+        "root": {"position": {"0.0": [0, 0, 0], "4.0": [0, -95, 0]}, "rotation": {"0.0": [0, 0, 0], "4.0": [0, 0, 10]}},
+        "head": {"rotation": {"0.0": [0, 0, 0], "0.8": [-30, 0, 0], "4.0": [-30, 0, 0]}},
+        "jaw": {"rotation": {"0.0": [0, 0, 0], "0.8": [45, 0, 0], "4.0": [45, 0, 0]}}}}
+    anims = {"idle": loop(5.0, idle), "walk": loop(3.0, walk), "lash": lash, "roar": roar, "rise": rise, "death": death}
+
+    # the slams: the arm goes up and back, then comes down straight onto the water at one of three reaches
+    landings = []
+    raise_by = -150 if fingertip(m, {"right_arm": (-150, 0, 0)})[1] > fingertip(m, {"right_arm": (150, 0, 0)})[1] else 150
+    for i, reach in enumerate(REACHES):
+        du, dl = solve(m, reach * 2, WATER, (-220, 220), (-200, 200))
+        tip = fingertip(m, {"right_arm": (du, 0, 0), "right_forearm": (dl, 0, 0)})
+        landings.append((round(-tip[2] / 2, 1), round(tip[0] / 2, 1)))
+        for side in ("right", "left"):
+            anims[f"slam_{side}_{i}"] = {"loop": "hold_on_last_frame", "animation_length": 1.0, "bones": {
+                f"{side}_arm": {"rotation": {"0.0": [0, 0, 0], "0.75": [raise_by, 0, 0], "1.0": [du, 0, 0]}},
+                f"{side}_forearm": {"rotation": {"0.0": [0, 0, 0], "0.75": [20, 0, 0], "1.0": [dl, 0, 0]}},
+                "chest": {"rotation": {"0.0": [0, 0, 0], "0.75": [-8, 0, 0], "1.0": [12, 0, 0]}}}}
+    m.save(anims)
+    print("slam landings (forward, right) in blocks:", landings)
 
 
 # ---------------------------------------------------------------- tide-scale armour and the boss's drops

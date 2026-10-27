@@ -24,7 +24,7 @@ import net.minecraft.world.phys.Vec3;
 
 /**
  * 潮母祭品: held up before the idol in the temple at night, it is answered. The tide comes in, and out in the sea
- * in front of the temple the Tide Mother's true body rises.
+ * in front of the temple, in plain sight of the shore, the Tide Mother's true body rises. She never comes ashore.
  */
 public class TideOfferingItem extends Item {
     private static final double IDOL_RANGE = 16.0;
@@ -68,19 +68,28 @@ public class TideOfferingItem extends Item {
         return InteractionResultHolder.consume(stack);
     }
 
-    /** The nearest stretch of open water out in front of the idol, or failing that a spot twenty blocks out. */
+    /**
+     * Open sea out in front of the idol, forty to a hundred blocks off, deep enough to hide her until she rises:
+     * near enough to the shore that she can be seen from it. Failing that, anywhere round the idol at that range.
+     */
     private static Vec3 riseFrom(ServerLevel level, TideMotherIdol idol) {
-        Vec3 out = Vec3.directionFromRotation(0.0F, idol.getYRot());
-        for (int distance = 24; distance <= 96; distance += 4) {
-            int x = Mth.floor(idol.getX() + out.x * distance);
-            int z = Mth.floor(idol.getZ() + out.z * distance);
-            int surface = level.getHeight(Heightmap.Types.WORLD_SURFACE, x, z);
-            if (level.getFluidState(new BlockPos(x, surface - 1, z)).is(FluidTags.WATER)) {
-                return new Vec3(x + 0.5, level.getHeight(Heightmap.Types.OCEAN_FLOOR, x, z), z + 0.5);
+        for (int turn = 0; turn <= 180; turn += 15) {
+            for (int sign : turn == 0 || turn == 180 ? new int[]{1} : new int[]{1, -1}) {
+                Vec3 out = Vec3.directionFromRotation(0.0F, idol.getYRot() + sign * turn);
+                for (int distance = 40; distance <= 100; distance += 4) {
+                    int x = Mth.floor(idol.getX() + out.x * distance);
+                    int z = Mth.floor(idol.getZ() + out.z * distance);
+                    int surface = level.getHeight(Heightmap.Types.WORLD_SURFACE, x, z);
+                    int floor = level.getHeight(Heightmap.Types.OCEAN_FLOOR, x, z);
+                    if (surface - floor >= 3 && level.getFluidState(new BlockPos(x, surface - 1, z)).is(FluidTags.WATER)) {
+                        return new Vec3(x + 0.5, floor, z + 0.5);
+                    }
+                }
             }
         }
-        int x = Mth.floor(idol.getX() + out.x * 20);
-        int z = Mth.floor(idol.getZ() + out.z * 20);
-        return new Vec3(x + 0.5, level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z), z + 0.5);
+        Vec3 out = Vec3.directionFromRotation(0.0F, idol.getYRot());
+        int x = Mth.floor(idol.getX() + out.x * 60);
+        int z = Mth.floor(idol.getZ() + out.z * 60);
+        return new Vec3(x + 0.5, level.getHeight(Heightmap.Types.OCEAN_FLOOR, x, z), z + 0.5);
     }
 }

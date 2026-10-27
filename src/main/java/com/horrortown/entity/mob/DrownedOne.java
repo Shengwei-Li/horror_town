@@ -19,12 +19,15 @@ import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.common.NeoForgeMod;
 
 /**
  * 水鬼: one of the town who walked into the sea, come back bloated and grey-blue, hair plastered over where the
- * face was. Crawls out of the pools at night; when it catches you it drags you towards it and down.
+ * face was. Crawls out of the pools at night on long thin limbs, and swims as well as it crawls; when it catches
+ * you it drags you towards it and down, and out of your boat if you are in one.
  */
 public class DrownedOne extends HorrorMonster {
     public DrownedOne(EntityType<? extends Monster> type, Level level) {
@@ -33,7 +36,8 @@ public class DrownedOne extends HorrorMonster {
 
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH, 24.0).add(Attributes.MOVEMENT_SPEED, 0.23)
-                .add(Attributes.ATTACK_DAMAGE, 4.0).add(Attributes.FOLLOW_RANGE, 32.0);
+                .add(Attributes.ATTACK_DAMAGE, 4.0).add(Attributes.FOLLOW_RANGE, 32.0)
+                .add(NeoForgeMod.SWIM_SPEED, 2.5);
     }
 
     @Override
@@ -51,6 +55,10 @@ public class DrownedOne extends HorrorMonster {
     @Override
     public boolean doHurtTarget(Entity target) {
         boolean hit = super.doHurtTarget(target);
+        if (hit && target.getVehicle() instanceof Boat && this.random.nextInt(3) == 0) {
+            target.stopRiding();
+            this.playSound(SoundEvents.GENERIC_SPLASH, 1.0F, 0.8F);
+        }
         if (hit && target instanceof LivingEntity living) {
             living.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 1), this);
             Vec3 pull = this.position().subtract(living.position()).normalize().scale(0.4);

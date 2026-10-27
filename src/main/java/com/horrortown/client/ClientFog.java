@@ -2,6 +2,7 @@ package com.horrortown.client;
 
 import com.horrortown.HorrorTownMod;
 import com.horrortown.world.FogHarbor;
+import com.horrortown.entity.boss.TideMotherTrue;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.FogRenderer;
@@ -41,6 +42,11 @@ public final class ClientFog {
     private static final float TIDE_MAX_FOG = 0.2F;
     private static final float TIDE_NEAR = 40.0F;
     private static final float TIDE_FAR = 150.0F;
+    /** While the Tide Mother is up the haze draws back far enough that she can be seen whole from the shore. */
+    private static final float MOTHER_NEAR = 90.0F;
+    private static final float MOTHER_FAR = 280.0F;
+    private static final double MOTHER_SEEN = 320.0;
+    private static boolean motherUp;
 
     private static final ResourceKey<Biome> DROWNED_GROVE = biome("drowned_grove");
     private static final ResourceKey<Biome> FOG_MARSH = biome("fog_marsh");
@@ -85,6 +91,10 @@ public final class ClientFog {
             return;
         }
         bank = target > bank ? Math.min(target, bank + RISE) : Math.max(target, bank - LIFT);
+        if (mc.level.getGameTime() % 20 == 0) {
+            motherUp = !mc.level.getEntitiesOfClass(TideMotherTrue.class,
+                    mc.player.getBoundingBox().inflate(MOTHER_SEEN), TideMotherTrue::isAlive).isEmpty();
+        }
 
         float mist = 0.0F;
         Holder<Biome> here = mc.level.getBiome(BlockPos.containing(mc.gameRenderer.getMainCamera().getPosition()));
@@ -113,6 +123,10 @@ public final class ClientFog {
             // a tide night: the haze starts further out, so the shape at sea stands out against it
             far = Math.max(far, TIDE_FAR);
             near = Math.max(near, TIDE_NEAR);
+        }
+        if (motherUp) {
+            far = Math.max(far, MOTHER_FAR);
+            near = Math.max(near, MOTHER_NEAR);
         }
         // never push fog further out than vanilla wants it (render distance, blindness, darkness)
         event.setFarPlaneDistance(Math.min(event.getFarPlaneDistance(), far));

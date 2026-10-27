@@ -38,10 +38,11 @@ public final class DevAutoShot {
     /** {time of day, fog (negative: a tide night), camera x, y, z, target x, y, z} in the town's frame. */
     /** A fog value that means: stand one of every creature in a row on the street, frozen, to be looked at. */
     private static final float LINEUP = -2.0F;
+    /** A fog value that means: raise the Tide Mother out at sea in front of the town, held mid-slam. */
+    private static final float MOTHER = -3.0F;
     private static final float[][] SHOTS = {
-            {6000, LINEUP, 0, 6, -40, 0, 7, -6},
-            {6000, LINEUP, -10, 3, -30, -10, 2, -20},
-            {6000, LINEUP, 10, 3, -30, 10, 2, -20},
+            {6000, MOTHER, 1000, 0, 0, 0, 0, 0},
+            {6000, MOTHER, 1001, 0, 0, 0, 0, 0},
     };
 
     private static int ticks;
@@ -85,6 +86,8 @@ public final class DevAutoShot {
                         m -> !m.isNoAi()).forEach(net.minecraft.world.entity.Entity::discard);
                 if (shot[1] == LINEUP) {
                     lineUp(level);
+                } else if (shot[1] == MOTHER) {
+                    raiseMother(level);
                 } else if (shot[1] < 0.0F && !TideNight.get(level).active()) {
                     TideNight.get(level).start(level);
                 }
@@ -92,6 +95,15 @@ public final class DevAutoShot {
                         level.getSeed()).ifPresent(site -> {
                     Vec3 eye = town(site, shot[2], shot[3], shot[4]);
                     Vec3 look = town(site, shot[5], shot[6], shot[7]).subtract(eye);
+                    if (shot[2] >= 1000 && motherAt != null) {
+                        // 1000: from her side, out over the water; 1001: from above, looking down on her slam
+                        Vec3 side = Vec3.atLowerCornerOf(site.seaward().getClockWise().getNormal());
+                        Vec3 sea = Vec3.atLowerCornerOf(site.seaward().getNormal());
+                        eye = shot[2] == 1000 ? motherAt.add(side.scale(48)).add(sea.scale(-20)).add(0, 26, 0)
+                                : motherAt.add(sea.scale(-10)).add(side.scale(6)).add(0, 70, 0);
+                        look = (shot[2] == 1000 ? motherAt.add(sea.scale(-16)).add(0, 14, 0)
+                                : motherAt.add(sea.scale(-26))).subtract(eye);
+                    }
                     float yaw = (float) (Mth.atan2(-look.x, look.z) * Mth.RAD_TO_DEG);
                     float pitch = (float) (-Mth.atan2(look.y, look.horizontalDistance()) * Mth.RAD_TO_DEG);
                     for (ServerPlayer player : server.getPlayerList().getPlayers()) {
@@ -101,10 +113,10 @@ public final class DevAutoShot {
                 });
             });
             ClientFog.forceNow(Math.max(0.0F, shot[1]));
-            if (shot[1] < 0.0F && shot[1] != LINEUP) {
+            if (shot[1] < 0.0F && shot[1] != LINEUP && shot[1] != MOTHER) {
                 WatcherApparition.riseNow();
             }
-        } else if (t % STEP == SETTLE - 20 && shot[1] < 0.0F && shot[1] != LINEUP
+        } else if (t % STEP == SETTLE - 20 && shot[1] < 0.0F && shot[1] != LINEUP && shot[1] != MOTHER
                 && WatcherApparition.position() != null) {
             // tide shots: turn to face the Watcher, a second before the picture is taken
             mc.player.lookAt(EntityAnchorArgument.Anchor.EYES, WatcherApparition.position().add(0, 20, 0));
@@ -152,6 +164,42 @@ public final class DevAutoShot {
                 mother.setYBodyRot(site.seaward().getOpposite().toYRot());
                 mother.setYHeadRot(site.seaward().getOpposite().toYRot());
                 level.addFreshEntity(mother);
+            }
+        });
+    }
+
+    private static boolean motherUp;
+    private static Vec3 motherAt;
+
+    /** The Tide Mother out in the first deep water in front of the town, facing it, held mid-slam, with a
+     * glowstone post where that slam is worked out to land. */
+    private static void raiseMother(ServerLevel level) {
+        if (motherUp) {
+            return;
+        }
+        motherUp = true;
+        TownSite.get(level.getChunkSource().getGenerator(), level.getChunkSource().randomState(), level,
+                level.getSeed()).ifPresent(site -> {
+            for (int z = 60; z <= 120; z += 2) {
+                BlockPos column = Builder.toWorld(site.centre(), site.seaward(), 0, 0, z);
+                int surface = level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE, column.getX(), column.getZ());
+                int floor = level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.OCEAN_FLOOR, column.getX(), column.getZ());
+                if (surface - floor < 3 && z < 120) {
+                    continue;
+                }
+                var mother = com.horrortown.registry.ModEntities.TIDE_MOTHER_TRUE.get().create(level);
+                float yaw = site.seaward().getOpposite().toYRot();
+                mother.setNoAi(true);
+                mother.moveTo(column.getX() + 0.5, floor, column.getZ() + 0.5, yaw, 0.0F);
+                mother.setYBodyRot(yaw);
+                mother.setYHeadRot(yaw);
+                Vec3 lands = mother.pose(2);
+                level.addFreshEntity(mother);
+                motherAt = mother.position();
+                for (int dy = 0; dy < 4; dy++) {
+                    level.setBlockAndUpdate(BlockPos.containing(lands).above(dy), net.minecraft.world.level.block.Blocks.GLOWSTONE.defaultBlockState());
+                }
+                return;
             }
         });
     }

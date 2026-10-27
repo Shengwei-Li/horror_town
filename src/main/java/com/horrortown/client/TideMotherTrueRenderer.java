@@ -3,11 +3,11 @@ package com.horrortown.client;
 import com.horrortown.entity.boss.TideMotherTrue;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 
-/** 潮母真身: drawn at a third of its size and rendered three times as big, about ten blocks tall. */
+/** 潮母真身: drawn at an eighth of her size and rendered eight times as big, about forty blocks tall. */
 public class TideMotherTrueRenderer extends HorrorMobRenderer<TideMotherTrue> {
     public TideMotherTrueRenderer(EntityRendererProvider.Context context) {
-        super(context, "tide_mother_true", true, true, 3.0F);
-        withScale(3.0F);
+        super(context, "tide_mother_true", true, false, 8.0F);
+        withScale(8.0F);
     }
 
     @Override
