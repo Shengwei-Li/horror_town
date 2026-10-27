@@ -1,5 +1,6 @@
 package com.horrortown.town;
 
+import com.horrortown.entity.TideMotherIdol;
 import com.horrortown.entity.TownRole;
 import com.horrortown.entity.Townsfolk;
 import com.horrortown.registry.ModEntities;
@@ -119,6 +120,22 @@ public class TownPiece extends StructurePiece {
         }
         stand.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.SKELETON_SKULL));
         level.addFreshEntity(stand);
+    }
+
+    /** Stands the idol on its pedestal at a local spot, facing {@code facing} (a world direction). */
+    void idol(Builder b, int x, int y, int z, Direction facing) {
+        if (!b.inChunk(x, y, z)) {
+            return;
+        }
+        WorldGenLevel level = b.level();
+        TideMotherIdol idol = ModEntities.TIDE_MOTHER.get().create(level.getLevel());
+        if (idol == null) {
+            return;
+        }
+        BlockPos pos = b.world(x, y, z);
+        idol.moveTo(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, facing.toYRot(), 0.0F);
+        idol.setYHeadRot(facing.toYRot());
+        level.addFreshEntity(idol);
     }
 
     /** Puts a townsfolk at a local spot of this piece, if that spot is in the chunk being generated. */

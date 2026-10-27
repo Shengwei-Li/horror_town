@@ -23,16 +23,15 @@ import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.LanternBlock;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
-import net.minecraft.world.level.block.PointedDripstoneBlock;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SkullBlock;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.VineBlock;
+import net.minecraft.world.level.block.WallTorchBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoorHingeSide;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
-import net.minecraft.world.level.block.state.properties.DripstoneThickness;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -45,6 +44,9 @@ final class Buildings {
     private static final BlockState AIR = Blocks.AIR.defaultBlockState();
     private static final BlockState DARK_PLANKS = Blocks.DARK_OAK_PLANKS.defaultBlockState();
     private static final BlockState SPRUCE_PLANKS = Blocks.SPRUCE_PLANKS.defaultBlockState();
+    /** The temple: its main roof starts this high, and a skirt of tiles runs round the hall lower down. */
+    private static final int ROOF_BASE = 16;
+    private static final int SKIRT = 8;
     private static final BlockState BUTTON = Blocks.POLISHED_BLACKSTONE_BUTTON.defaultBlockState()
             .setValue(ButtonBlock.FACE, AttachFace.WALL);
     private static final BlockState TILES = Blocks.DEEPSLATE_TILES.defaultBlockState();
@@ -569,7 +571,7 @@ final class Buildings {
             }
         }
         // hall walls: stone footing, dark planks, posts; walls rise to meet the roof
-        int x0 = 3, x1 = 17, z0 = 2, z1 = 20, wallTop = 9;
+        int x0 = 3, x1 = 17, z0 = 2, z1 = 20, wallTop = 15;
         for (int x = x0; x <= x1; x++) {
             for (int z = z0; z <= z1; z++) {
                 boolean wall = x == x0 || x == x1 || z == z0 || z == z1;
@@ -595,7 +597,7 @@ final class Buildings {
         }
         // tall window slits down the sides
         for (int z = 6; z <= 14; z += 4) {
-            for (int y = 4; y <= 6; y++) {
+            for (int y = 7; y <= 12; y++) {
                 b.set(x0, y, z, AIR);
                 b.set(x1, y, z, AIR);
             }
@@ -607,23 +609,23 @@ final class Buildings {
         b.set(10, 7, z1, RED);
         // red pillars holding the front eave, and steps down to the pier
         for (int x : new int[]{5, 15}) {
-            for (int y = 1; y <= 9; y++) {
+            for (int y = 1; y <= ROOF_BASE - 1; y++) {
                 b.set(x, y, 22, RED);
             }
         }
         // a skirt of tiles around the hall below the main roof
         for (int x = x0 - 1; x <= x1 + 1; x++) {
-            b.set(x, 6, z0 - 1, stairs(Blocks.DEEPSLATE_TILE_STAIRS, Direction.SOUTH, Half.BOTTOM));
-            b.set(x, 6, z1 + 1, stairs(Blocks.DEEPSLATE_TILE_STAIRS, Direction.NORTH, Half.BOTTOM));
+            b.set(x, SKIRT, z0 - 1, stairs(Blocks.DEEPSLATE_TILE_STAIRS, Direction.SOUTH, Half.BOTTOM));
+            b.set(x, SKIRT, z1 + 1, stairs(Blocks.DEEPSLATE_TILE_STAIRS, Direction.NORTH, Half.BOTTOM));
         }
         for (int z = z0; z <= z1; z++) {
-            b.set(x0 - 1, 6, z, stairs(Blocks.DEEPSLATE_TILE_STAIRS, Direction.EAST, Half.BOTTOM));
-            b.set(x1 + 1, 6, z, stairs(Blocks.DEEPSLATE_TILE_STAIRS, Direction.WEST, Half.BOTTOM));
+            b.set(x0 - 1, SKIRT, z, stairs(Blocks.DEEPSLATE_TILE_STAIRS, Direction.EAST, Half.BOTTOM));
+            b.set(x1 + 1, SKIRT, z, stairs(Blocks.DEEPSLATE_TILE_STAIRS, Direction.WEST, Half.BOTTOM));
         }
         // the main hipped roof
         for (int k = 0; ; k++) {
             int ax = 1 + k, bx = w - 2 - k, az = k, bz = 22 - k;
-            int y = 10 + k;
+            int y = ROOF_BASE + k;
             if (bx - ax < 2) {
                 b.fill(ax, y, az, bx, y, bz, TILES);
                 break;
@@ -639,11 +641,11 @@ final class Buildings {
         }
         // curled-up eave corners
         for (int[] c : new int[][]{{1, 0}, {19, 0}, {1, 22}, {19, 22}}) {
-            b.set(c[0], 10, c[1], TILES);
-            b.set(c[0], 11, c[1], Blocks.DEEPSLATE_TILE_WALL.defaultBlockState());
+            b.set(c[0], ROOF_BASE, c[1], TILES);
+            b.set(c[0], ROOF_BASE + 1, c[1], Blocks.DEEPSLATE_TILE_WALL.defaultBlockState());
         }
         for (int[] l : new int[][]{{2, 1}, {18, 1}, {2, 21}, {18, 21}, {10, 22}, {7, 22}, {13, 22}}) {
-            b.set(l[0], 9, l[1], hangingLantern());
+            b.set(l[0], ROOF_BASE - 1, l[1], hangingLantern());
         }
         // inside: two rows of posts, candles along the walls, an offering chest
         for (int z = 6; z <= 18; z += 4) {
@@ -655,95 +657,27 @@ final class Buildings {
             b.set(x1 - 1, 1, z, candles(b, x1 - 1, 1, z));
         }
         chest(b, x0 + 1, 1, 18, Direction.EAST, TEMPLE_LOOT);
-        idol(b);
+        altar(b);
+        piece.idol(b, 10, 3, 6, piece.facing.getOpposite()); // the model's face is on its -Z side
         piece.spawn(b, 10, 1, 16, TownRole.KEEPER);
     }
 
     /** Height of the main roof surface over a spot (the stairs of the hipped roof). */
     private static int roofHeight(int x, int z) {
-        return 10 + Math.min(Math.min(x - 1, 19 - x), Math.min(z, 22 - z));
+        return ROOF_BASE + Math.min(Math.min(x - 1, 19 - x), Math.min(z, 22 - z));
     }
 
-    /**
-     * 潮母: the idol. A hooded, faceless thing on a black pedestal, its lower body a heap of coiling tentacles
-     * that spill across the floor, long arms reaching for the worshippers, pale eyes everywhere.
-     */
-    private static void idol(Builder b) {
-        BlockState flesh = Blocks.DARK_PRISMARINE.defaultBlockState();
-        BlockState sucker = Blocks.PRISMARINE.defaultBlockState();
-        BlockState eye = Blocks.PEARLESCENT_FROGLIGHT.defaultBlockState();
-        BlockState hood = Blocks.BLACK_WOOL.defaultBlockState();
-        double cx = 10.0, cz = 7.0;
-
-        // pedestal
+    /** The idol's black pedestal and the offerings heaped in front of it (the idol itself is a model). */
+    private static void altar(Builder b) {
         b.fill(6, 1, 3, 14, 1, 10, Blocks.POLISHED_DEEPSLATE.defaultBlockState());
         b.fill(7, 2, 4, 13, 2, 9, TILES);
-
-        // tentacles coiling out over the floor and up the back wall
-        int tentacles = 9;
-        for (int i = 0; i < tentacles; i++) {
-            double angle = Math.PI * 2 * i / tentacles + b.rand(i, 0, 0, 80) * 0.5;
-            double curl = (b.rand(i, 0, 0, 81) - 0.5) * 2.0;
-            double reach = 3.5 + b.rand(i, 0, 0, 82) * 3.0;
-            for (double t = 0.0; t <= 1.0; t += 0.03) {
-                double a = angle + curl * t * t * 2.5;
-                double r = 1.5 + reach * t;
-                int x = Mth.floor(cx + Math.cos(a) * r);
-                int z = Mth.floor(cz + Math.sin(a) * r * 0.8);
-                int y = Mth.floor(4.0 + 3.0 * Math.sin(Math.PI * t * 0.9) - 3.5 * t);
-                // stay inside the hall and keep the aisle up to the offerings clear
-                if (x < 4 || x > 16 || z < 3 || z > 15 || y < 1 || z > 10 && Math.abs(x - 10) <= 2) {
-                    continue;
-                }
-                b.set(x, y, z, b.chance(x, y, z, 83, 0.06F) ? eye : b.chance(x, y, z, 84, 0.2F) ? sucker : flesh);
-                if (t < 0.45) {
-                    b.set(x, y + 1, z, flesh);
-                }
-            }
+        // candles all along the front edge of the pedestal, and torches on the posts down the hall
+        for (int x = 6; x <= 14; x++) {
+            b.set(x, 2, 10, candles(b, x, 2, 10));
         }
-        // lower body and torso: two lumpy ellipsoids
-        blob(b, cx, 6.0, cz, 3.5, 3.0, 2.6, flesh, Blocks.SCULK.defaultBlockState(), 85);
-        blob(b, cx, 10.5, cz, 2.6, 2.6, 2.0, flesh, sucker, 86);
-        // arms reaching forward and down, ending in hooked claws
-        for (int side = -1; side <= 1; side += 2) {
-            double sx = cx + side * 2.8, sy = 11.5, sz = cz + 1.0;
-            double hx = cx + side * 4.5, hy = 7.5, hz = cz + 5.5;
-            for (double t = 0.0; t <= 1.0; t += 0.05) {
-                b.set(Mth.floor(Mth.lerp(t, sx, hx)), Mth.floor(Mth.lerp(t, sy, hy)), Mth.floor(Mth.lerp(t, sz, hz)),
-                        flesh);
-            }
-            int hxI = Mth.floor(hx), hyI = Mth.floor(hy), hzI = Mth.floor(hz);
-            b.fill(hxI, hyI, hzI, hxI + side, hyI, hzI + 1, flesh);
-            for (int dx = 0; dx <= 1; dx++) {
-                b.set(hxI + side * dx, hyI - 1, hzI + 1, Blocks.POINTED_DRIPSTONE.defaultBlockState()
-                        .setValue(PointedDripstoneBlock.TIP_DIRECTION, Direction.DOWN)
-                        .setValue(PointedDripstoneBlock.THICKNESS, DripstoneThickness.TIP));
-            }
-        }
-        // the hood: a black dome, open at the front onto nothing but eyes
-        double hy = 14.0, hr = 2.6;
-        for (int x = Mth.floor(cx - hr) - 1; x <= Mth.ceil(cx + hr) + 1; x++) {
-            for (int y = Mth.floor(hy - hr) - 1; y <= Mth.ceil(hy + hr) + 1; y++) {
-                for (int z = Mth.floor(cz - hr) - 1; z <= Mth.ceil(cz + hr) + 2; z++) {
-                    double dx = x + 0.5 - cx, dy = y + 0.5 - hy, dz = z + 0.5 - cz;
-                    double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-                    if (dist > hr + 0.5) {
-                        continue;
-                    }
-                    boolean front = dz > hr - 1.3 && dy < 1.2 && Math.abs(dx) < 1.8;
-                    if (front) {
-                        b.set(x, y, z, Blocks.BLACK_CONCRETE.defaultBlockState());
-                    } else if (dist > hr - 0.7) {
-                        b.set(x, y, z, hood);
-                    } else {
-                        b.set(x, y, z, Blocks.BLACK_CONCRETE.defaultBlockState());
-                    }
-                }
-            }
-        }
-        int faceZ = Mth.floor(cz + hr);
-        for (int[] e : new int[][]{{9, 14}, {11, 14}, {10, 13}, {8, 13}, {12, 13}, {10, 15}}) {
-            b.set(e[0], e[1], faceZ, eye);
+        for (int z = 6; z <= 18; z += 4) {
+            b.set(5, 4, z, Blocks.WALL_TORCH.defaultBlockState().setValue(WallTorchBlock.FACING, Direction.WEST));
+            b.set(15, 4, z, Blocks.WALL_TORCH.defaultBlockState().setValue(WallTorchBlock.FACING, Direction.EAST));
         }
         // offerings at its feet
         for (int x = 6; x <= 14; x++) {
@@ -764,22 +698,5 @@ final class Buildings {
         b.set(7, 1, 12, Blocks.WATER_CAULDRON.defaultBlockState().setValue(LayeredCauldronBlock.LEVEL, 3));
         b.set(13, 1, 12, Blocks.WATER_CAULDRON.defaultBlockState().setValue(LayeredCauldronBlock.LEVEL, 3));
         b.fill(9, 1, 14, 11, 1, 14, Blocks.POLISHED_DEEPSLATE_SLAB.defaultBlockState());
-    }
-
-    private static void blob(Builder b, double cx, double cy, double cz, double rx, double ry, double rz,
-                             BlockState main, BlockState spots, int salt) {
-        for (int x = Mth.floor(cx - rx); x <= Mth.ceil(cx + rx); x++) {
-            for (int y = Mth.floor(cy - ry); y <= Mth.ceil(cy + ry); y++) {
-                for (int z = Mth.floor(cz - rz); z <= Mth.ceil(cz + rz); z++) {
-                    double dx = (x + 0.5 - cx) / rx, dy = (y + 0.5 - cy) / ry, dz = (z + 0.5 - cz) / rz;
-                    double lump = (b.rand(x, y, z, salt) - 0.5) * 0.35;
-                    if (dx * dx + dy * dy + dz * dz <= 1.0 + lump) {
-                        b.set(x, y, z, b.chance(x, y, z, salt + 1, 0.12F) ? spots
-                                : b.chance(x, y, z, salt + 2, 0.04F) ? Blocks.PEARLESCENT_FROGLIGHT.defaultBlockState()
-                                : main);
-                    }
-                }
-            }
-        }
     }
 }

@@ -51,7 +51,7 @@ final class TownLayout {
         plan.add(TownPiece.Kind.MARKET, -STREET_HALF - 1, 16, plusX, 9, 7, 20, 8, 4, 6, 300);
         plan.add(TownPiece.Kind.WAREHOUSE, STREET_HALF + 1, 16, minusX, 9, 10, 20, 14, 4, 9, 400);
         // the temple faces back towards the town; its front step meets the end of the pier
-        plan.add(TownPiece.Kind.TEMPLE, 0, 61, land, 21, 25, 45, 28, 10, 24, 500);
+        plan.add(TownPiece.Kind.TEMPLE, 0, 61, land, 21, 25, 45, 34, 10, 24, 500);
     }
 
     /** Turns town-frame positions into pieces. */

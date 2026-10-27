@@ -43,5 +43,6 @@
   "biome.horror_town.mud_flats": "Mud Flats",
   "block.horror_town.tide_film": "Shallow Water",
   "block.horror_town.rotten_planks": "Rotten Planks",
-  "block.horror_town.soaked_planks": "Soaked Planks"
+  "block.horror_town.soaked_planks": "Soaked Planks",
+  "entity.horror_town.tide_mother": "Tide Mother"
 }

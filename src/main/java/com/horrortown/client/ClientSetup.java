@@ -25,6 +25,7 @@ public final class ClientSetup {
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModEntities.TOWNSFOLK.get(), TownsfolkRenderer::new);
+        event.registerEntityRenderer(ModEntities.TIDE_MOTHER.get(), TideMotherRenderer::new);
     }
 
     /** The shallow-water film takes the colour of the water around it. */
