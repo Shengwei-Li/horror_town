@@ -39,18 +39,22 @@ CONFIGURED = {
     "tide_film": {"type": f"{MOD}:tide_film", "config": {}},
     "drowned_cypress": {"type": f"{MOD}:drowned_cypress", "config": {}},
     "dead_tree": {"type": f"{MOD}:dead_tree", "config": {}},
+    "tide_bones": {"type": f"{MOD}:tide_bones", "config": {}},
 }
 PLACED = {
     "drowned_cypress_sparse": placed(f"{MOD}:drowned_cypress", RARITY(2), IN_SQUARE, SEA_FLOOR, IN_BIOME),
     "drowned_cypress_dense": placed(f"{MOD}:drowned_cypress", count(uniform(2, 4)), IN_SQUARE, SEA_FLOOR, IN_BIOME),
     "dead_tree_common": placed(f"{MOD}:dead_tree", count(uniform(0, 2)), IN_SQUARE, SEA_FLOOR, IN_BIOME),
     "dead_tree_rare": placed(f"{MOD}:dead_tree", RARITY(3), IN_SQUARE, SEA_FLOOR, IN_BIOME),
+    # 潮骨: now and then the skeleton of something huge on the sea floor
+    "tide_bones": placed(f"{MOD}:tide_bones", RARITY(10), IN_SQUARE, SEA_FLOOR, IN_BIOME),
     # once per chunk, from the chunk corner
     "tide_film": placed(f"{MOD}:tide_film"),
 }
 
 # One global order for the vegetation step; every biome takes a subsequence so there is never an order cycle.
 VEGETATION_ORDER = [
+    f"{MOD}:tide_bones",
     "minecraft:glow_lichen",
     "minecraft:patch_large_fern",
     f"{MOD}:drowned_cypress_dense",
@@ -213,7 +217,8 @@ BIOMES = {
         "water_color": 0x1F2A2B, "water_fog_color": 0x10181A,
         "grass_color": 0x5A6447, "foliage_color": 0x4A5238,
     }, features([
-        "minecraft:glow_lichen", "minecraft:seagrass_normal", "minecraft:seagrass_simple", "minecraft:kelp_cold",
+        f"{MOD}:tide_bones", "minecraft:glow_lichen", "minecraft:seagrass_normal", "minecraft:seagrass_simple",
+        "minecraft:kelp_cold",
     ]), spawners(
         monster=LAND_MONSTERS + [spawn("minecraft:drowned", 70, 1, 2)],
         water_creature=[spawn("minecraft:squid", 3, 1, 4)],
@@ -224,7 +229,8 @@ BIOMES = {
         "water_color": 0x0E1517, "water_fog_color": 0x05090A,
         "grass_color": 0x5A6447, "foliage_color": 0x4A5238,
     }, features([
-        "minecraft:glow_lichen", "minecraft:seagrass_deep", "minecraft:seagrass_simple", "minecraft:kelp_cold",
+        f"{MOD}:tide_bones", "minecraft:glow_lichen", "minecraft:seagrass_deep", "minecraft:seagrass_simple",
+        "minecraft:kelp_cold",
     ]), spawners(
         monster=LAND_MONSTERS + [spawn("minecraft:drowned", 100, 1, 3)],
         water_creature=[spawn("minecraft:squid", 1, 1, 2)],

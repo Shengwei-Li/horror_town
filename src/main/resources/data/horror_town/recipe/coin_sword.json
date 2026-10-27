@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "C",
+    "C",
+    "R"
+  ],
+  "key": {
+    "C": {
+      "item": "horror_town:copper_coin"
+    },
+    "R": {
+      "item": "horror_town:hanging_rope"
+    }
+  },
+  "result": {
+    "id": "horror_town:coin_sword",
+    "count": 1
+  }
+}

@@ -1,5 +1,6 @@
 package com.horrortown.registry;
 
+import com.horrortown.item.LeechItem;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.food.FoodProperties;
@@ -29,10 +30,8 @@ public final class ModDrops {
     /** 吊绳 */
     public static final DeferredItem<Item> HANGING_ROPE = ModItems.ITEMS.registerSimpleItem("hanging_rope");
     /** 水蛭 */
-    public static final DeferredItem<Item> LEECH = ModItems.ITEMS.registerSimpleItem("leech",
-            new Item.Properties().food(new FoodProperties.Builder().nutrition(2)
-                    .saturationModifier(0.1F)
-                    .effect(() -> new MobEffectInstance(MobEffects.HUNGER, 300), 0.8F).build()));
+    public static final DeferredItem<LeechItem> LEECH = ModItems.ITEMS.register("leech",
+            () -> new LeechItem(new Item.Properties().stacksTo(16)));
     /** 螺肉 */
     public static final DeferredItem<Item> SNAIL_FLESH = ModItems.ITEMS.registerSimpleItem("snail_flesh",
             new Item.Properties().food(new FoodProperties.Builder().nutrition(4)

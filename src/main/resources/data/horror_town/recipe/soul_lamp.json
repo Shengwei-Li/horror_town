@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " T ",
+    "HCH",
+    " H "
+  ],
+  "key": {
+    "T": {
+      "item": "horror_town:human_tooth"
+    },
+    "H": {
+      "item": "horror_town:pale_hide"
+    },
+    "C": {
+      "item": "minecraft:candle"
+    }
+  },
+  "result": {
+    "id": "horror_town:soul_lamp",
+    "count": 1
+  }
+}

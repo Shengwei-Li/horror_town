@@ -30,7 +30,7 @@ MOBS = [
     ("hairless_dog", "HairlessDog", "MONSTER", 0.6, 0.9, (0xCEB2AC, 0x10100C), "any", False, "无毛犬", "Hairless Dog"),
 ]
 
-# item, zh, en, kind (plain / food:<nutrition>:<saturation>:<effect>:<seconds>:<chance> / harpoon)
+# item, zh, en, kind (plain / food:<nutrition>:<saturation>:<effect>:<seconds>:<chance> / harpoon / leech)
 ITEMS = [
     ("fish_scale", "鳞片", "Fish Scale", "plain"),
     ("murky_eye", "浊眼", "Murky Eye", "plain"),
@@ -40,7 +40,7 @@ ITEMS = [
     ("human_tooth", "人牙", "Human Tooth", "plain"),
     ("pale_hide", "白皮", "Pale Hide", "plain"),
     ("hanging_rope", "吊绳", "Hanging Rope", "plain"),
-    ("leech", "水蛭", "Leech", "food:2:0.1:HUNGER:15:0.8"),
+    ("leech", "水蛭", "Leech", "leech"),
     ("snail_flesh", "螺肉", "Snail Flesh", "food:4:0.4:CONFUSION:10:0.5"),
     ("face_fish", "人面鱼", "Face Fish", "food:3:0.3:CONFUSION:15:1.0"),
     ("harpoon", "鱼叉", "Harpoon", "harpoon"),
@@ -141,7 +141,8 @@ def java():
 
 
 def items_java():
-    lines = ["package com.horrortown.registry;\n", "import net.minecraft.world.effect.MobEffectInstance;",
+    lines = ["package com.horrortown.registry;\n", "import com.horrortown.item.LeechItem;",
+             "import net.minecraft.world.effect.MobEffectInstance;",
              "import net.minecraft.world.effect.MobEffects;", "import net.minecraft.world.food.FoodProperties;",
              "import net.minecraft.world.item.Item;", "import net.minecraft.world.item.SwordItem;",
              "import net.minecraft.world.item.Tiers;", "import net.neoforged.neoforge.registries.DeferredItem;", "",
@@ -153,6 +154,9 @@ def items_java():
         lines.append(f"    /** {zh} */")
         if kind == "plain":
             lines.append(f"    public static final DeferredItem<Item> {const} = ModItems.ITEMS.registerSimpleItem(\"{item}\");")
+        elif kind == "leech":
+            lines.append(f"    public static final DeferredItem<LeechItem> {const} = ModItems.ITEMS.register(\"{item}\",")
+            lines.append("            () -> new LeechItem(new Item.Properties().stacksTo(16)));")
         elif kind == "harpoon":
             lines.append(f"    public static final DeferredItem<SwordItem> {const} = ModItems.ITEMS.register(\"{item}\",")
             lines.append("            () -> new SwordItem(Tiers.IRON, new Item.Properties()")

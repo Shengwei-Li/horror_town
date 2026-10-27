@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "horror_town:tide_bone"
+    },
+    {
+      "item": "horror_town:tide_bone"
+    },
+    {
+      "item": "horror_town:tide_bone"
+    },
+    {
+      "item": "horror_town:murky_eye"
+    },
+    {
+      "item": "horror_town:paper_charm"
+    }
+  ],
+  "result": {
+    "id": "horror_town:tide_offering",
+    "count": 1
+  }
+}

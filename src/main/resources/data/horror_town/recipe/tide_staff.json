@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "SES",
+    " B ",
+    " B "
+  ],
+  "key": {
+    "S": {
+      "item": "horror_town:mother_scale"
+    },
+    "E": {
+      "item": "horror_town:tide_heart"
+    },
+    "B": {
+      "item": "horror_town:tide_bone"
+    }
+  },
+  "result": {
+    "id": "horror_town:tide_staff",
+    "count": 1
+  }
+}

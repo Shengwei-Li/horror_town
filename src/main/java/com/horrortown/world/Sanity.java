@@ -4,6 +4,7 @@ import com.horrortown.HorrorTownMod;
 import com.horrortown.network.ModNetwork;
 import com.horrortown.registry.ModAttachments;
 import com.horrortown.registry.ModEffects;
+import com.horrortown.item.TideStaffItem;
 import com.horrortown.registry.ModGear;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -71,12 +72,6 @@ public final class Sanity {
         if (!(event.getEntity() instanceof ServerPlayer player) || player.tickCount % 20 != 0) {
             return;
         }
-        int scales = ModGear.tideScalePieces(player);
-        if (scales == 4 && player.isInWater()) {
-            // the full set of her scales: the sea takes you as one of its own
-            player.addEffect(new MobEffectInstance(MobEffects.DOLPHINS_GRACE, 60, 0, false, false, true));
-            player.addEffect(new MobEffectInstance(MobEffects.WATER_BREATHING, 60, 0, false, false, true));
-        }
         ServerLevel level = player.serverLevel();
         if (!FogHarbor.is(level) || player.isCreative() || player.isSpectator()) {
             return;
@@ -90,7 +85,8 @@ public final class Sanity {
 
         // the Watcher noticing you
         int exposure = EXPOSURE.getOrDefault(player.getUUID(), 0);
-        exposure = tide && underSky && onCoast ? exposure + 1 : Math.max(0, exposure - 2);
+        // under her veil its eye slides off you
+        exposure = tide && underSky && onCoast && !ModGear.veiled(player) ? exposure + 1 : Math.max(0, exposure - 2);
         if (exposure >= NOTICE_SECONDS) {
             exposure = NOTICE_SECONDS;
             if (!player.hasEffect(ModEffects.WATCHED)) {
@@ -103,11 +99,13 @@ public final class Sanity {
         boolean watched = player.hasEffect(ModEffects.WATCHED);
 
         float sanity = get(player);
-        float shield = 1.0F - 0.2F * scales; // each piece of tide-scale armour keeps a fifth of it off
+        // her staff in your hand halves it all; a soul lamp keeps off most of what the dark does
+        float shield = TideStaffItem.carried(player) ? 0.5F : 1.0F;
+        float dark = ModGear.carriesLamp(player) ? 0.4F : 1.0F;
         if (watched) {
             sanity -= 0.8F * shield;
         } else if (night && underSky && lamplight < 8) {
-            sanity -= 0.05F * shield;
+            sanity -= 0.05F * shield * dark;
         }
         if (!underSky && lamplight >= 10) {
             sanity += 0.3F;

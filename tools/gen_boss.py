@@ -1,6 +1,6 @@
-"""潮母真身, the Tide Mother's true body: the boss model, its drops' icons and the tide-scale armour textures.
+"""潮母真身, the Tide Mother's true body: the boss model and its drops' icons (what is made from them is in gen_gear).
 
-Usage: python tools/gen_boss.py <vanilla texture dir with diamond_layer_1/2.png and diamond_*.png item icons>
+Usage: python tools/gen_boss.py <vanilla texture dir with trident.png>
 The model is drawn at an eighth of its size and rendered eight times as big: forty blocks of her standing in the
 shallows on a mass of tentacles. Her arm poses are solved against the model itself, and the slams' landing points
 printed at the end go into TideMotherTrue.SLAMS. Front is -Z.
@@ -175,7 +175,7 @@ def tide_mother_true():
     print("slam landings (forward, right) in blocks:", landings)
 
 
-# ---------------------------------------------------------------- tide-scale armour and the boss's drops
+# ---------------------------------------------------------------- the boss's drops
 
 def tide_palette(img, base=(46, 74, 76), light=(150, 176, 168), scale_period=3):
     """Recolours a vanilla texture into overlapping grey-green scales, keeping its shading and its alpha."""
@@ -192,15 +192,6 @@ def tide_palette(img, base=(46, 74, 76), light=(150, 176, 168), scale_period=3):
             c = [base[k] + (light[k] - base[k]) * lum + rng.randint(-5, 5) for k in range(3)]
             px[x, y] = tuple(max(0, min(255, int(v))) for v in c) + (a,)
     return img
-
-
-def armour():
-    out = ROOT / "textures/models/armor"
-    out.mkdir(parents=True, exist_ok=True)
-    for layer in (1, 2):
-        tide_palette(Image.open(VTEX / f"diamond_layer_{layer}.png"), scale_period=2).save(out / f"tide_scale_layer_{layer}.png")
-    for piece in ("helmet", "chestplate", "leggings", "boots"):
-        tide_palette(Image.open(VTEX / f"diamond_{piece}.png")).save(ROOT / f"textures/item/tide_scale_{piece}.png")
 
 
 def drops():
@@ -254,10 +245,6 @@ NAMES = {
     "item.horror_town.tide_heart": ("潮母之心", "Heart of the Tide Mother"),
     "item.horror_town.tide_offering": ("潮母祭品", "Tide Offering"),
     "item.horror_town.tide_harpoon": ("潮心鱼叉", "Tide-Heart Harpoon"),
-    "item.horror_town.tide_scale_helmet": ("潮鳞盔", "Tide-Scale Helmet"),
-    "item.horror_town.tide_scale_chestplate": ("潮鳞甲", "Tide-Scale Chestplate"),
-    "item.horror_town.tide_scale_leggings": ("潮鳞护腿", "Tide-Scale Leggings"),
-    "item.horror_town.tide_scale_boots": ("潮鳞靴", "Tide-Scale Boots"),
     "entity.horror_town.tide_mother_true": ("潮母真身", "The Tide Mother"),
     "message.horror_town.offering.no_idol": ("须在庙里的潮母像前献上。", "It has to be offered before the idol in the temple."),
     "message.horror_town.offering.day": ("白天，她不应。", "By day, she does not answer."),
@@ -267,9 +254,6 @@ NAMES = {
 
 
 def data():
-    for piece, pattern in (("helmet", ["SSS", "S S"]), ("chestplate", ["S S", "SSS", "SSS"]),
-                           ("leggings", ["SSS", "S S", "S S"]), ("boots", ["S S", "S S"])):
-        shaped(f"tide_scale_{piece}", pattern, {"S": "mother_scale"})
     shapeless("tide_offering", ["bog_heart", "murky_eye", "paper_charm", "coarse_salt", "human_tooth"])
     shapeless("tide_harpoon", ["harpoon", "tide_heart", "mother_scale", "mother_scale"], "equipment")
     write(DATA / "loot_table/entities/tide_mother_true.json", {"type": "minecraft:entity", "pools": [
@@ -278,8 +262,7 @@ def data():
             {"function": "minecraft:enchanted_count_increase", "enchantment": "minecraft:looting",
              "count": {"type": "minecraft:uniform", "min": 0, "max": 2}}]}]},
         {"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{M}:tide_heart"}]}]})
-    for name in ("mother_scale", "tide_heart", "tide_offering", "tide_harpoon", "tide_scale_helmet",
-                 "tide_scale_chestplate", "tide_scale_leggings", "tide_scale_boots"):
+    for name in ("mother_scale", "tide_heart", "tide_offering", "tide_harpoon"):
         parent = "minecraft:item/handheld" if name == "tide_harpoon" else "minecraft:item/generated"
         write(ROOT / f"models/item/{name}.json", {"parent": parent, "textures": {"layer0": f"{M}:item/{name}"}})
     for lang, idx in (("zh_cn", 0), ("en_us", 1)):
@@ -290,7 +273,6 @@ def data():
 
 
 tide_mother_true()
-armour()
 drops()
 data()
 print("ok")

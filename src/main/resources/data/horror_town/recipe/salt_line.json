@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "horror_town:coarse_salt"
+    },
+    {
+      "item": "horror_town:coarse_salt"
+    }
+  ],
+  "result": {
+    "id": "horror_town:salt_line",
+    "count": 6
+  }
+}

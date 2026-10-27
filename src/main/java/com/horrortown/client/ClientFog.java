@@ -3,6 +3,7 @@ package com.horrortown.client;
 import com.horrortown.HorrorTownMod;
 import com.horrortown.world.FogHarbor;
 import com.horrortown.entity.boss.TideMotherTrue;
+import com.horrortown.registry.ModGear;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.FogRenderer;
@@ -11,6 +12,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.material.FogType;
@@ -42,6 +44,8 @@ public final class ClientFog {
     private static final float TIDE_MAX_FOG = 0.2F;
     private static final float TIDE_NEAR = 40.0F;
     private static final float TIDE_FAR = 150.0F;
+    /** How much farther you see through the fog with the Tide Mother's veil on. */
+    private static final float VEIL_SIGHT = 1.8F;
     /** While the Tide Mother is up the haze draws back far enough that she can be seen whole from the shore. */
     private static final float MOTHER_NEAR = 90.0F;
     private static final float MOTHER_FAR = 280.0F;
@@ -127,6 +131,12 @@ public final class ClientFog {
         if (motherUp) {
             far = Math.max(far, MOTHER_FAR);
             near = Math.max(near, MOTHER_NEAR);
+        }
+        Player player = Minecraft.getInstance().player;
+        if (player != null && ModGear.veiled(player)) {
+            // through her veil the fog thins
+            far = far * VEIL_SIGHT + 16.0F;
+            near = near * VEIL_SIGHT;
         }
         // never push fog further out than vanilla wants it (render distance, blindness, darkness)
         event.setFarPlaneDistance(Math.min(event.getFarPlaneDistance(), far));

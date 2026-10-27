@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "horror_town:paper_effigy",
+    "horror_town:hanged_one",
+    "horror_town:drowned_one",
+    "horror_town:salt_husk",
+    "#minecraft:undead"
+  ]
+}

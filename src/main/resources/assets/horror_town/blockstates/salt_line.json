@@ -1,0 +1,22 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "horror_town:block/salt_line",
+        "y": 0
+      },
+      {
+        "model": "horror_town:block/salt_line",
+        "y": 90
+      },
+      {
+        "model": "horror_town:block/salt_line",
+        "y": 180
+      },
+      {
+        "model": "horror_town:block/salt_line",
+        "y": 270
+      }
+    ]
+  }
+}

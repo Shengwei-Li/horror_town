@@ -40,8 +40,11 @@ public final class DevAutoShot {
     private static final float LINEUP = -2.0F;
     /** A fog value that means: raise the Tide Mother out at sea in front of the town, held mid-slam. */
     private static final float MOTHER = -3.0F;
+    /** A fog value that means: in creative, third person, holding up the Tide Mother's staff and drawing swords. */
+    private static final float STAFF = -4.0F;
     private static final float[][] SHOTS = {
-            {18000, -1.0F, 0, 4, 10, 0, 2, 80},
+            {6000, STAFF, 0, 2, 4, 6, 2, 30},
+            {6000, STAFF, 0, 2, 4, 6, 2, 30},
     };
 
     private static int ticks;
@@ -87,7 +90,7 @@ public final class DevAutoShot {
                     lineUp(level);
                 } else if (shot[1] == MOTHER) {
                     raiseMother(level);
-                } else if (shot[1] < 0.0F && !TideNight.get(level).active()) {
+                } else if (shot[1] < 0.0F && shot[1] != STAFF && !TideNight.get(level).active()) {
                     TideNight.get(level).start(level);
                 }
                 TownSite.get(level.getChunkSource().getGenerator(), level.getChunkSource().randomState(), level,
@@ -106,22 +109,35 @@ public final class DevAutoShot {
                     float yaw = (float) (Mth.atan2(-look.x, look.z) * Mth.RAD_TO_DEG);
                     float pitch = (float) (-Mth.atan2(look.y, look.horizontalDistance()) * Mth.RAD_TO_DEG);
                     for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-                        player.setGameMode(GameType.SPECTATOR);
+                        player.setGameMode(shot[1] == STAFF ? GameType.CREATIVE : GameType.SPECTATOR);
                         player.teleportTo(level, eye.x, eye.y - player.getEyeHeight(), eye.z, yaw, pitch);
+                        if (shot[1] == STAFF) {
+                            player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,
+                                    new net.minecraft.world.item.ItemStack(com.horrortown.registry.ModGear.TIDE_STAFF.get()));
+                        }
                     }
                 });
             });
             ClientFog.forceNow(Math.max(0.0F, shot[1]));
-            if (shot[1] < 0.0F && shot[1] != LINEUP && shot[1] != MOTHER) {
+            if (shot[1] < 0.0F && shot[1] != LINEUP && shot[1] != MOTHER && shot[1] != STAFF) {
                 WatcherApparition.riseNow();
             }
         } else if (t % STEP == SETTLE - 20 && shot[1] < 0.0F && shot[1] != LINEUP && shot[1] != MOTHER
+                && shot[1] != STAFF
                 && WatcherApparition.position() != null) {
             // tide shots: turn to face the Watcher, a second before the picture is taken
             mc.player.lookAt(EntityAnchorArgument.Anchor.EYES, WatcherApparition.position().add(0, 20, 0));
             mc.player.yRotO = mc.player.getYRot();
             mc.player.xRotO = mc.player.getXRot();
-        } else if (t % STEP == SETTLE) {
+        }
+        if (shot[1] == STAFF) {
+            // hold the use key down, as a player would to keep the staff raised
+            mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_BACK);
+            // the second time round, let go just before the picture so the swords are caught in flight
+            boolean letGo = index > 0 && SHOTS[index - 1][1] == STAFF;
+            mc.options.keyUse.setDown(t % STEP > 20 && t % STEP < (letGo ? SETTLE - 3 : SETTLE + 5));
+        }
+        if (t % STEP == SETTLE) {
             ClientFog.forceNow(Math.max(0.0F, shot[1]));
             Screenshot.grab(mc.gameDirectory, "ht_" + index + ".png", mc.getMainRenderTarget(), message -> {
             });

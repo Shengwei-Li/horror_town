@@ -2,12 +2,14 @@ package com.horrortown.client;
 
 import com.horrortown.HorrorTownMod;
 import com.horrortown.registry.ModEntities;
+import com.horrortown.registry.ModGear;
 import com.horrortown.world.FogHarbor;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import com.horrortown.registry.ModBlocks;
 import net.minecraft.client.renderer.BiomeColors;
+import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
@@ -29,6 +31,8 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.TIDE_MOTHER.get(), TideMotherRenderer::new);
         event.registerEntityRenderer(ModEntities.WATCHER.get(), WatcherRenderer::new);
         event.registerEntityRenderer(ModEntities.TIDE_MOTHER_TRUE.get(), TideMotherTrueRenderer::new);
+        event.registerEntityRenderer(ModGear.WATER_SWORD_ENTITY.get(), WaterSwordRenderer::new);
+        event.registerEntityRenderer(ModGear.TALISMAN_ENTITY.get(), ThrownItemRenderer::new);
         ModMobRenderers.register(event);
     }
 

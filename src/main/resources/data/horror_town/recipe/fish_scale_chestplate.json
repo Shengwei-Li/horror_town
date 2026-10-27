@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "S S",
+    "SHS",
+    "SSS"
+  ],
+  "key": {
+    "S": {
+      "item": "horror_town:fish_scale"
+    },
+    "H": {
+      "item": "horror_town:pale_hide"
+    }
+  },
+  "result": {
+    "id": "horror_town:fish_scale_chestplate",
+    "count": 1
+  }
+}

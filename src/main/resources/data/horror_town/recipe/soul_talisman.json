@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    {
+      "item": "horror_town:paper_charm"
+    },
+    {
+      "item": "horror_town:murky_eye"
+    }
+  ],
+  "result": {
+    "id": "horror_town:soul_talisman",
+    "count": 2
+  }
+}

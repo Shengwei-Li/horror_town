@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "hanging=false": {
+      "model": "horror_town:block/soul_lamp"
+    },
+    "hanging=true": {
+      "model": "horror_town:block/soul_lamp_hanging"
+    }
+  }
+}

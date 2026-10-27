@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=y": {
+      "model": "horror_town:block/tide_bone"
+    },
+    "axis=z": {
+      "model": "horror_town:block/tide_bone_horizontal",
+      "x": 90
+    },
+    "axis=x": {
+      "model": "horror_town:block/tide_bone_horizontal",
+      "x": 90,
+      "y": 90
+    }
+  }
+}
