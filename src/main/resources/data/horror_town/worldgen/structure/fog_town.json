@@ -1,0 +1,7 @@
+{
+  "type": "horror_town:fog_town",
+  "biomes": "#horror_town:has_fog_town",
+  "step": "surface_structures",
+  "spawn_overrides": {},
+  "terrain_adaptation": "none"
+}

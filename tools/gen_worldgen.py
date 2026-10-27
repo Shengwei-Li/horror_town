@@ -462,6 +462,22 @@ BIOME_TAGS = {
 }
 
 
+# ---------------------------------------------------------------- the town
+
+TOWN_STRUCTURE = {
+    "type": f"{MOD}:fog_town",
+    "biomes": f"#{MOD}:has_fog_town",
+    "step": "surface_structures",
+    "spawn_overrides": {},
+    "terrain_adaptation": "none",
+}
+# every chunk is a candidate; the structure itself only starts in the chunk of the town site
+TOWN_STRUCTURE_SET = {
+    "structures": [{"structure": f"{MOD}:fog_town", "weight": 1}],
+    "placement": {"type": "minecraft:random_spread", "spacing": 1, "separation": 0, "salt": 1931},
+}
+
+
 def write(path, data):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
@@ -480,6 +496,9 @@ def main():
     for name, data in density_functions().items():
         write(ours / "worldgen/density_function/fog_harbor" / f"{name}.json", data)
     write(ours / "worldgen/world_preset/fog_harbor.json", WORLD_PRESET)
+    write(ours / "worldgen/structure/fog_town.json", TOWN_STRUCTURE)
+    write(ours / "worldgen/structure_set/fog_town.json", TOWN_STRUCTURE_SET)
+    write(ours / "tags/worldgen/biome/has_fog_town.json", {"replace": False, "values": [f"{MOD}:{n}" for n in ALL]})
     write(ours / "dimension_type/fog_harbor.json", dimension_type())
     write(ROOT / "minecraft/tags/worldgen/world_preset/normal.json",
           {"replace": False, "values": [f"{MOD}:fog_harbor"]})

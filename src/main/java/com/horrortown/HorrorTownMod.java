@@ -1,13 +1,17 @@
 package com.horrortown;
 
+import com.horrortown.entity.Townsfolk;
 import com.horrortown.network.FogPayload;
 import com.horrortown.registry.ModBlocks;
+import com.horrortown.registry.ModEntities;
 import com.horrortown.registry.ModItems;
+import com.horrortown.registry.ModStructures;
 import com.horrortown.registry.ModWorldgen;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 
 @Mod(HorrorTownMod.MODID)
 public class HorrorTownMod {
@@ -18,8 +22,16 @@ public class HorrorTownMod {
         ModItems.ITEMS.register(modBus);
         ModWorldgen.FEATURES.register(modBus);
         ModWorldgen.DENSITY_FUNCTION_TYPES.register(modBus);
+        ModEntities.ENTITIES.register(modBus);
+        ModStructures.TYPES.register(modBus);
+        ModStructures.PIECES.register(modBus);
+        modBus.addListener(this::registerAttributes);
         modBus.addListener(FogPayload::register);
         modBus.addListener(this::addCreativeTabItems);
+    }
+
+    private void registerAttributes(EntityAttributeCreationEvent event) {
+        event.put(ModEntities.TOWNSFOLK.get(), Townsfolk.createAttributes().build());
     }
 
     private void addCreativeTabItems(BuildCreativeModeTabContentsEvent event) {
@@ -27,6 +39,10 @@ public class HorrorTownMod {
             event.accept(ModItems.ROT_MUD.get());
             event.accept(ModItems.SALT_CRUST.get());
             event.accept(ModItems.ROTWOOD_LOG.get());
+        } else if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
+            event.accept(ModItems.COPPER_COIN.get());
+        } else if (event.getTabKey() == CreativeModeTabs.SPAWN_EGGS) {
+            event.accept(ModItems.TOWNSFOLK_SPAWN_EGG.get());
         }
     }
 }

@@ -2,14 +2,19 @@ package com.horrortown.world;
 
 import com.horrortown.HorrorTownMod;
 import com.horrortown.network.FogPayload;
+import com.horrortown.town.TownSite;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.BlockPos;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.levelgen.RandomState;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
@@ -30,12 +35,17 @@ public final class WorldEvents {
         }
     }
 
-    /** New Fog Harbor worlds start on the coast of the island (vanilla would pick somewhere near the centre). */
+    /** New Fog Harbor worlds start on the road outside the town gate, on the island's coast. */
     @SubscribeEvent
     public static void onCreateSpawn(LevelEvent.CreateSpawnPosition event) {
         if (event.getLevel() instanceof ServerLevel level && FogHarbor.is(level)) {
-            CoastSpawn.find(level).ifPresent(pos -> {
-                event.getSettings().setSpawn(pos, 0.0F);
+            ChunkGenerator generator = level.getChunkSource().getGenerator();
+            RandomState random = level.getChunkSource().randomState();
+            TownSite.get(generator, random, level, level.getSeed()).ifPresent(site -> {
+                BlockPos spawn = site.spawn();
+                int y = Math.max(generator.getSeaLevel() + 1, generator.getBaseHeight(spawn.getX(), spawn.getZ(),
+                        Heightmap.Types.OCEAN_FLOOR_WG, level, random));
+                event.getSettings().setSpawn(spawn.atY(y), 0.0F);
                 event.setCanceled(true);
             });
         }

@@ -1,13 +1,18 @@
 package com.horrortown.client;
 
 import com.horrortown.HorrorTownMod;
+import com.horrortown.town.Builder;
+import com.horrortown.town.TownSite;
 import com.horrortown.world.FogWeather;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
 import net.minecraft.client.server.IntegratedServer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -15,28 +20,28 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 
 /**
  * Development only, off unless the game is started with {@code -Dhorror_town.autoshot}: once a singleplayer
- * world is loaded, turns the player into a spectator, steps through a few times of day / fog levels / view
- * directions, saves a screenshot of each to {@code screenshots/ht_*.png}, then quits.
+ * world is loaded, turns the player into a spectator, steps through a set of camera spots around the town at
+ * different times of day and fog, saves a screenshot of each to {@code screenshots/ht_*.png}, then quits.
  */
 @EventBusSubscriber(modid = HorrorTownMod.MODID, value = Dist.CLIENT)
 public final class DevAutoShot {
     private static final boolean ENABLED = System.getProperty("horror_town.autoshot") != null;
     /** Ticks to let chunks load before the first shot, and between shots. */
     private static final int WARMUP = 400;
-    private static final int STEP = 120;
-    private static final int SETTLE = 100;
-    /** {time of day, fog, yaw, pitch, height above spawn} */
+    private static final int STEP = 140;
+    private static final int SETTLE = 120;
+    /** {time of day, fog, camera x, y, z, target x, y, z} in the town's frame (y from the deck). */
     private static final float[][] SHOTS = {
-            {6000, 0.0F, 0, 5, 2},
-            {6000, 0.0F, 90, 5, 2},
-            {6000, 0.0F, 180, 5, 2},
-            {6000, 0.0F, 270, 5, 2},
-            {6000, 0.9F, 0, 5, 2},
-            {6000, 0.0F, 0, -25, 2},
-            {12600, 0.0F, 270, 0, 2},
-            {18000, 0.0F, 90, 5, 2},
-            {6000, 0.0F, 0, 35, 60},
-            {6000, 0.0F, 180, 35, 60},
+            {6000, 0.0F, 0, 2, -66, 0, 4, 0},
+            {6000, 0.0F, 0, 2, -30, 0, 3, 20},
+            {6000, 0.0F, 0, 2, 25, 0, 8, 75},
+            {6000, 0.0F, 0, 2, 62, 0, 9, 78},
+            {6000, 0.0F, -30, 40, -80, 0, 0, 10},
+            {6000, 0.0F, -5, 2, 1, -9, 2, -2},
+            {12600, 0.6F, 2, 2, -10, 0, 3, 60},
+            {18000, 0.0F, 0, 2, -30, 0, 3, 20},
+            {18000, 0.0F, 0, 2, 62, 0, 9, 78},
+            {6000, 0.0F, 45, 30, 40, 0, 5, 30},
     };
 
     private static int ticks;
@@ -70,13 +75,17 @@ public final class DevAutoShot {
                 ServerLevel level = server.overworld();
                 level.setDayTime((long) shot[0]);
                 FogWeather.get(level).set(level, shot[1], 1_000_000);
-                for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-                    player.setGameMode(GameType.SPECTATOR);
-                    var spawn = level.getSharedSpawnPos();
-                    double y = level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                            spawn.getX(), spawn.getZ()) + shot[4];
-                    player.teleportTo(level, spawn.getX() + 0.5, y, spawn.getZ() + 0.5, shot[2], shot[3]);
-                }
+                TownSite.get(level.getChunkSource().getGenerator(), level.getChunkSource().randomState(), level,
+                        level.getSeed()).ifPresent(site -> {
+                    Vec3 eye = town(site, shot[2], shot[3], shot[4]);
+                    Vec3 look = town(site, shot[5], shot[6], shot[7]).subtract(eye);
+                    float yaw = (float) (Mth.atan2(-look.x, look.z) * Mth.RAD_TO_DEG);
+                    float pitch = (float) (-Mth.atan2(look.y, look.horizontalDistance()) * Mth.RAD_TO_DEG);
+                    for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+                        player.setGameMode(GameType.SPECTATOR);
+                        player.teleportTo(level, eye.x, eye.y - player.getEyeHeight(), eye.z, yaw, pitch);
+                    }
+                });
             });
             ClientFog.forceNow(shot[1]);
         } else if (t % STEP == SETTLE) {
@@ -84,5 +93,10 @@ public final class DevAutoShot {
             Screenshot.grab(mc.gameDirectory, "ht_" + index + ".png", mc.getMainRenderTarget(), message -> {
             });
         }
+    }
+
+    private static Vec3 town(TownSite site, float x, float y, float z) {
+        BlockPos pos = Builder.toWorld(site.centre(), site.seaward(), Mth.floor(x), Mth.floor(y), Mth.floor(z));
+        return Vec3.atBottomCenterOf(pos);
     }
 }
