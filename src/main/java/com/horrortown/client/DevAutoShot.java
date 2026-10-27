@@ -39,7 +39,7 @@ public final class DevAutoShot {
     /** A fog value that means: stand one of every creature in a row on the street, frozen, to be looked at. */
     private static final float LINEUP = -2.0F;
     private static final float[][] SHOTS = {
-            {6000, LINEUP, 0, 5, -42, 0, 3, -20},
+            {6000, LINEUP, 0, 6, -40, 0, 7, -6},
             {6000, LINEUP, -10, 3, -30, -10, 2, -20},
             {6000, LINEUP, 10, 3, -30, 10, 2, -20},
     };
@@ -143,6 +143,15 @@ public final class DevAutoShot {
                     mob.setYBodyRot(site.seaward().getOpposite().toYRot());
                     level.addFreshEntity(mob);
                 }
+            }
+            var mother = com.horrortown.registry.ModEntities.TIDE_MOTHER_TRUE.get().create(level);
+            if (mother != null) {
+                Vec3 at = town(site, 0, 1, -6);
+                mother.setNoAi(true);
+                mother.moveTo(at.x, at.y, at.z, site.seaward().getOpposite().toYRot(), 0.0F);
+                mother.setYBodyRot(site.seaward().getOpposite().toYRot());
+                mother.setYHeadRot(site.seaward().getOpposite().toYRot());
+                level.addFreshEntity(mother);
             }
         });
     }

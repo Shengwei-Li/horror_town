@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "horror_town:bog_heart"
+    },
+    {
+      "item": "horror_town:murky_eye"
+    },
+    {
+      "item": "horror_town:paper_charm"
+    },
+    {
+      "item": "horror_town:coarse_salt"
+    },
+    {
+      "item": "horror_town:human_tooth"
+    }
+  ],
+  "result": {
+    "id": "horror_town:tide_offering",
+    "count": 1
+  }
+}

@@ -4,6 +4,7 @@ import com.horrortown.HorrorTownMod;
 import com.horrortown.network.ModNetwork;
 import com.horrortown.registry.ModAttachments;
 import com.horrortown.registry.ModEffects;
+import com.horrortown.registry.ModGear;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -70,6 +71,12 @@ public final class Sanity {
         if (!(event.getEntity() instanceof ServerPlayer player) || player.tickCount % 20 != 0) {
             return;
         }
+        int scales = ModGear.tideScalePieces(player);
+        if (scales == 4 && player.isInWater()) {
+            // the full set of her scales: the sea takes you as one of its own
+            player.addEffect(new MobEffectInstance(MobEffects.DOLPHINS_GRACE, 60, 0, false, false, true));
+            player.addEffect(new MobEffectInstance(MobEffects.WATER_BREATHING, 60, 0, false, false, true));
+        }
         ServerLevel level = player.serverLevel();
         if (!FogHarbor.is(level) || player.isCreative() || player.isSpectator()) {
             return;
@@ -96,10 +103,11 @@ public final class Sanity {
         boolean watched = player.hasEffect(ModEffects.WATCHED);
 
         float sanity = get(player);
+        float shield = 1.0F - 0.2F * scales; // each piece of tide-scale armour keeps a fifth of it off
         if (watched) {
-            sanity -= 0.8F;
+            sanity -= 0.8F * shield;
         } else if (night && underSky && lamplight < 8) {
-            sanity -= 0.05F;
+            sanity -= 0.05F * shield;
         }
         if (!underSky && lamplight >= 10) {
             sanity += 0.3F;

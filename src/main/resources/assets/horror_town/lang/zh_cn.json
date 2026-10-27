@@ -82,5 +82,18 @@
   "item.horror_town.leech": "水蛭",
   "item.horror_town.snail_flesh": "螺肉",
   "item.horror_town.face_fish": "人面鱼",
-  "item.horror_town.harpoon": "鱼叉"
+  "item.horror_town.harpoon": "鱼叉",
+  "item.horror_town.mother_scale": "潮母鳞",
+  "item.horror_town.tide_heart": "潮母之心",
+  "item.horror_town.tide_offering": "潮母祭品",
+  "item.horror_town.tide_harpoon": "潮心鱼叉",
+  "item.horror_town.tide_scale_helmet": "潮鳞盔",
+  "item.horror_town.tide_scale_chestplate": "潮鳞甲",
+  "item.horror_town.tide_scale_leggings": "潮鳞护腿",
+  "item.horror_town.tide_scale_boots": "潮鳞靴",
+  "entity.horror_town.tide_mother_true": "潮母真身",
+  "message.horror_town.offering.no_idol": "须在庙里的潮母像前献上。",
+  "message.horror_town.offering.day": "白天，她不应。",
+  "message.horror_town.offering.risen": "她已经上来了。",
+  "message.horror_town.offering.answered": "海里有东西应了。"
 }

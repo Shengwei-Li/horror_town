@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    {
+      "item": "horror_town:harpoon"
+    },
+    {
+      "item": "horror_town:tide_heart"
+    },
+    {
+      "item": "horror_town:mother_scale"
+    },
+    {
+      "item": "horror_town:mother_scale"
+    }
+  ],
+  "result": {
+    "id": "horror_town:tide_harpoon",
+    "count": 1
+  }
+}

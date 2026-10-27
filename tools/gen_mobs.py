@@ -398,7 +398,7 @@ def eye_crab():
         for k in range(3):
             z = -2.5 + k * 2.5
             m.bone(f"{side}_leg_{k}", "body", [sign * 5, 5, z],
-                   [([sign * 5 if sign > 0 else -11, 4.5, z - 0.5], [6, 1, 1], leg)], rotation=[0, 0, sign * -35])
+                   [([sign * 5 if sign > 0 else -11, 4.5, z - 0.5], [6, 1, 1], leg)], rotation=[0, 0, sign * 35])
         m.bone(f"{side}_claw", "body", [sign * 4, 5, -4],
                [([sign * 4 - 1.5, 4, -9], [3, 2, 5], shell)], rotation=[0, sign * 20, 0])
     legs = {f"{s}_leg_{k}": swing(0.5, 18, k * 1.3 + (0 if s == "right" else math.pi), axis=1)
@@ -555,8 +555,9 @@ def items():
         "................"], {"m": (150, 150, 146), "w": (110, 86, 58)})
 
 
-for build in (drowned_one, mud_lurker, paper_effigy, fishman, hanged_one, salt_husk, tooth_snail, eye_crab,
-              leech_eel, face_fish, hairless_dog):
-    build()
-items()
-print("ok")
+if __name__ == "__main__":
+    for build in (drowned_one, mud_lurker, paper_effigy, fishman, hanged_one, salt_husk, tooth_snail, eye_crab,
+                  leech_eel, face_fish, hairless_dog):
+        build()
+    items()
+    print("ok")

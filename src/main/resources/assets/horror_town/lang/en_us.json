@@ -82,5 +82,18 @@
   "item.horror_town.leech": "Leech",
   "item.horror_town.snail_flesh": "Snail Flesh",
   "item.horror_town.face_fish": "Face Fish",
-  "item.horror_town.harpoon": "Harpoon"
+  "item.horror_town.harpoon": "Harpoon",
+  "item.horror_town.mother_scale": "Tide Mother Scale",
+  "item.horror_town.tide_heart": "Heart of the Tide Mother",
+  "item.horror_town.tide_offering": "Tide Offering",
+  "item.horror_town.tide_harpoon": "Tide-Heart Harpoon",
+  "item.horror_town.tide_scale_helmet": "Tide-Scale Helmet",
+  "item.horror_town.tide_scale_chestplate": "Tide-Scale Chestplate",
+  "item.horror_town.tide_scale_leggings": "Tide-Scale Leggings",
+  "item.horror_town.tide_scale_boots": "Tide-Scale Boots",
+  "entity.horror_town.tide_mother_true": "The Tide Mother",
+  "message.horror_town.offering.no_idol": "It has to be offered before the idol in the temple.",
+  "message.horror_town.offering.day": "By day, she does not answer.",
+  "message.horror_town.offering.risen": "She is already here.",
+  "message.horror_town.offering.answered": "Something in the sea has answered."
 }

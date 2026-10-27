@@ -132,11 +132,11 @@ def render(qs, yaw, pitch=-20):
         e2 = [f[3][k] - f[0][k] for k in range(3)]
         n = (e1[1] * e2[2] - e1[2] * e2[1], e1[2] * e2[0] - e1[0] * e2[2], e1[0] * e2[1] - e1[1] * e2[0])
         ln = math.sqrt(sum(a * a for a in n)) or 1
-        if n[2] / ln > 0.02:  # facing away
+        if n[2] / ln < -0.02:  # (n points into the cube) facing away
             continue
         shade = 0.55 + 0.45 * max(0.0, -(n[0] * light[0] + n[1] * light[1] + n[2] * light[2]) / ln)
         depth = sum(q[2] for q in p) / 4
-        projected.append((depth, [(q[0], q[1]) for q in p], tuple(int(c * shade) for c in col)))
+        projected.append((depth, [(-q[0], q[1]) for q in p], tuple(int(c * shade) for c in col)))  # camera looks +z
     if not projected:
         return Image.new("RGB", (VIEW, VIEW), BG)
     xs = [x for _, pts, _ in projected for x, _ in pts]
@@ -145,12 +145,31 @@ def render(qs, yaw, pitch=-20):
     scale = (VIEW * 0.82) / size
     cx, cy = (max(xs) + min(xs)) / 2, (max(ys) + min(ys)) / 2
     ss = 2
-    img = Image.new("RGB", (VIEW * ss, VIEW * ss), BG)
-    draw = ImageDraw.Draw(img)
-    projected.sort(key=lambda t: -t[0])
-    for _, pts, col in projected:
-        poly = [((x - cx) * scale * ss + VIEW * ss / 2, -(y - cy) * scale * ss + VIEW * ss / 2) for x, y in pts]
-        draw.polygon(poly, fill=col, outline=col)
+    size_px = VIEW * ss
+    img = Image.new("RGB", (size_px, size_px), BG)
+    px = img.load()
+    zbuf = [[1e9] * size_px for _ in range(size_px)]
+    for depth_, pts, col in projected:
+        sp = [((x - cx) * scale * ss + size_px / 2, -(y - cy) * scale * ss + size_px / 2) for x, y in pts]
+        z = depth_
+        xs_, ys_ = [p[0] for p in sp], [p[1] for p in sp]
+        x0, x1 = max(0, int(min(xs_))), min(size_px - 1, int(math.ceil(max(xs_))))
+        y0, y1 = max(0, int(min(ys_))), min(size_px - 1, int(math.ceil(max(ys_))))
+        for tri in ((sp[0], sp[1], sp[2]), (sp[0], sp[2], sp[3])):
+            (ax, ay), (bx, by), (qx, qy) = tri
+            den = (by - qy) * (ax - qx) + (qx - bx) * (ay - qy)
+            if abs(den) < 1e-9:
+                continue
+            for yy in range(y0, y1 + 1):
+                for xx in range(x0, x1 + 1):
+                    fx, fy = xx + 0.5, yy + 0.5
+                    l1 = ((by - qy) * (fx - qx) + (qx - bx) * (fy - qy)) / den
+                    l2 = ((qy - ay) * (fx - qx) + (ax - qx) * (fy - qy)) / den
+                    if l1 < -0.01 or l2 < -0.01 or l1 + l2 > 1.01:
+                        continue
+                    if z < zbuf[yy][xx]:
+                        zbuf[yy][xx] = z
+                        px[xx, yy] = col
     return img.resize((VIEW, VIEW), Image.LANCZOS)
 
 

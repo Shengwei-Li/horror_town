@@ -4,6 +4,7 @@ import com.horrortown.HorrorTownMod;
 import com.horrortown.entity.TideMotherIdol;
 import com.horrortown.entity.Townsfolk;
 import com.horrortown.entity.Watcher;
+import com.horrortown.entity.boss.TideMotherTrue;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -37,6 +38,15 @@ public final class ModEntities {
                     .noSummon()
                     .clientTrackingRange(0)
                     .build("watcher"));
+
+    /** 潮母真身: the boss, called up out of the sea by an offering at the idol. */
+    public static final DeferredHolder<EntityType<?>, EntityType<TideMotherTrue>> TIDE_MOTHER_TRUE = ENTITIES.register(
+            "tide_mother_true", () -> EntityType.Builder.<TideMotherTrue>of(TideMotherTrue::new, MobCategory.MONSTER)
+                    .sized(3.5F, 10.0F)
+                    .eyeHeight(9.0F)
+                    .clientTrackingRange(16)
+                    .fireImmune()
+                    .build("tide_mother_true"));
 
     private ModEntities() {
     }

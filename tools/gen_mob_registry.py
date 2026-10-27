@@ -49,7 +49,7 @@ ITEMS = [
 # what each drops: (item, min, max, chance)
 LOOT = {
     "drowned_one": [("minecraft:rotten_flesh", 0, 2, 1.0), (f"{M}:fish_scale", 0, 1, 1.0), (f"{M}:copper_coin", 1, 1, 0.3)],
-    "mud_lurker": [("minecraft:mud", 1, 3, 1.0), (f"{M}:bog_heart", 1, 1, 0.5)],
+    "mud_lurker": [("minecraft:mud", 3, 8, 1.0), (f"{M}:bog_heart", 1, 1, 1.0)],
     "paper_effigy": [("minecraft:paper", 1, 3, 1.0), (f"{M}:paper_charm", 1, 1, 1.0)],
     "fishman": [(f"{M}:fish_scale", 1, 3, 1.0), ("minecraft:cod", 0, 2, 1.0), (f"{M}:harpoon", 1, 1, 0.08)],
     "hanged_one": [(f"{M}:hanging_rope", 1, 1, 1.0), ("minecraft:bone", 0, 2, 1.0)],

@@ -1,12 +1,14 @@
 package com.horrortown;
 
 import com.horrortown.entity.Townsfolk;
+import com.horrortown.entity.boss.TideMotherTrue;
 import com.horrortown.network.ModNetwork;
 import com.horrortown.registry.ModAttachments;
 import com.horrortown.registry.ModBlocks;
 import com.horrortown.registry.ModDrops;
 import com.horrortown.registry.ModEffects;
 import com.horrortown.registry.ModEntities;
+import com.horrortown.registry.ModGear;
 import com.horrortown.registry.ModItems;
 import com.horrortown.registry.ModMobs;
 import com.horrortown.registry.ModStructures;
@@ -29,6 +31,8 @@ public class HorrorTownMod {
         ModEntities.ENTITIES.register(modBus);
         ModMobs.ENTITIES.register(modBus);
         ModDrops.init();
+        ModGear.init();
+        ModGear.ARMOR_MATERIALS.register(modBus);
         modBus.addListener(ModMobs::registerAttributes);
         modBus.addListener(ModMobs::registerSpawnPlacements);
         ModStructures.TYPES.register(modBus);
@@ -42,6 +46,7 @@ public class HorrorTownMod {
 
     private void registerAttributes(EntityAttributeCreationEvent event) {
         event.put(ModEntities.TOWNSFOLK.get(), Townsfolk.createAttributes().build());
+        event.put(ModEntities.TIDE_MOTHER_TRUE.get(), TideMotherTrue.createAttributes().build());
     }
 
     private void addCreativeTabItems(BuildCreativeModeTabContentsEvent event) {
@@ -55,6 +60,7 @@ public class HorrorTownMod {
         } else if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
             event.accept(ModItems.COPPER_COIN.get());
             ModDrops.ALL.forEach(item -> event.accept(item.get()));
+            ModGear.ALL.forEach(item -> event.accept(item.get()));
         } else if (event.getTabKey() == CreativeModeTabs.SPAWN_EGGS) {
             event.accept(ModItems.TOWNSFOLK_SPAWN_EGG.get());
             ModMobs.SPAWN_EGGS.forEach(egg -> event.accept(egg.get()));
