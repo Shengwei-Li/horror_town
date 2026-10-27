@@ -88,6 +88,7 @@ public class TideMotherTrue extends Monster implements GeoEntity {
     private static final double HOME_RANGE = 48.0;
     private static final double KEEP_DISTANCE = 24.0;
     private static final double WADE_SPEED = 0.05;
+    private static final int WADE_CLEARANCE = 12;
     private static final int MAX_DROWNED = 14;
     /** Destroy speed at or above which a block holds against her: obsidian and harder. */
     private static final float UNBREAKABLE = 50.0F;
@@ -228,6 +229,25 @@ public class TideMotherTrue extends Monster implements GeoEntity {
         }
     }
 
+    /**
+     * Whether everything within {@code radius} of this column is open water: no shore, pier or roof sticking out of
+     * it that her body would stand inside.
+     */
+    public static boolean openSea(ServerLevel level, int x, int z, int radius) {
+        for (int dx = -radius; dx <= radius; dx += 4) {
+            for (int dz = -radius; dz <= radius; dz += 4) {
+                if (dx * dx + dz * dz > radius * radius) {
+                    continue;
+                }
+                int surface = level.getHeight(Heightmap.Types.WORLD_SURFACE, x + dx, z + dz);
+                if (!level.getFluidState(new BlockPos(x + dx, surface - 1, z + dz)).is(FluidTags.WATER)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     /** Slowly after you, but never out of the water and never far from where she rose. */
     private void wade(ServerLevel level, LivingEntity target) {
         Vec3 to = target.position().subtract(this.position()).multiply(1, 0, 1);
@@ -237,10 +257,7 @@ public class TideMotherTrue extends Monster implements GeoEntity {
         }
         Vec3 step = to.normalize();
         Vec3 ahead = this.position().add(step.scale(6.0));
-        BlockPos column = BlockPos.containing(ahead);
-        int surface = level.getHeight(Heightmap.Types.WORLD_SURFACE, column.getX(), column.getZ());
-        boolean sea = level.getFluidState(new BlockPos(column.getX(), surface - 1, column.getZ())).is(FluidTags.WATER);
-        if (sea && ahead.distanceTo(Vec3.atBottomCenterOf(this.home)) < HOME_RANGE) {
+        if (openSea(level, Mth.floor(ahead.x), Mth.floor(ahead.z), WADE_CLEARANCE) && ahead.distanceTo(Vec3.atBottomCenterOf(this.home)) < HOME_RANGE) {
             double speed = WADE_SPEED * (this.enraged ? 1.4 : 1.0);
             this.setDeltaMovement(step.x * speed, this.getDeltaMovement().y, step.z * speed);
             if (this.tickCount % 40 == 0) {
