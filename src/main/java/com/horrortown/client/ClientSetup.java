@@ -28,6 +28,7 @@ public final class ClientSetup {
         event.registerEntityRenderer(ModEntities.TOWNSFOLK.get(), TownsfolkRenderer::new);
         event.registerEntityRenderer(ModEntities.TIDE_MOTHER.get(), TideMotherRenderer::new);
         event.registerEntityRenderer(ModEntities.WATCHER.get(), WatcherRenderer::new);
+        ModMobRenderers.register(event);
     }
 
     @SubscribeEvent

@@ -3,6 +3,7 @@ package com.horrortown.client;
 import com.horrortown.HorrorTownMod;
 import com.horrortown.town.Builder;
 import com.horrortown.town.TownSite;
+import com.horrortown.registry.ModMobs;
 import com.horrortown.world.FogWeather;
 import com.horrortown.world.TideNight;
 import net.minecraft.client.Minecraft;
@@ -35,9 +36,12 @@ public final class DevAutoShot {
     private static final int SETTLE = 120;
     /** {time of day, fog, camera x, y, z, target x, y, z} in the town's frame (y from the deck). */
     /** {time of day, fog (negative: a tide night), camera x, y, z, target x, y, z} in the town's frame. */
+    /** A fog value that means: stand one of every creature in a row on the street, frozen, to be looked at. */
+    private static final float LINEUP = -2.0F;
     private static final float[][] SHOTS = {
-            {13800, -1.0F, 0, 3, 30, 0, 16, 150},
-            {18000, -1.0F, 0, 3, 30, 0, 16, 150},
+            {6000, LINEUP, 0, 5, -42, 0, 3, -20},
+            {6000, LINEUP, -10, 3, -30, -10, 2, -20},
+            {6000, LINEUP, 10, 3, -30, 10, 2, -20},
     };
 
     private static int ticks;
@@ -76,7 +80,12 @@ public final class DevAutoShot {
                 ServerLevel level = server.overworld();
                 level.setDayTime((long) shot[0]);
                 FogWeather.get(level).set(level, Math.max(0.0F, shot[1]), 1_000_000);
-                if (shot[1] < 0.0F && !TideNight.get(level).active()) {
+                level.getEntitiesOfClass(net.minecraft.world.entity.monster.Monster.class,
+                        new net.minecraft.world.phys.AABB(level.getSharedSpawnPos()).inflate(200),
+                        m -> !m.isNoAi()).forEach(net.minecraft.world.entity.Entity::discard);
+                if (shot[1] == LINEUP) {
+                    lineUp(level);
+                } else if (shot[1] < 0.0F && !TideNight.get(level).active()) {
                     TideNight.get(level).start(level);
                 }
                 TownSite.get(level.getChunkSource().getGenerator(), level.getChunkSource().randomState(), level,
@@ -92,10 +101,11 @@ public final class DevAutoShot {
                 });
             });
             ClientFog.forceNow(Math.max(0.0F, shot[1]));
-            if (shot[1] < 0.0F) {
+            if (shot[1] < 0.0F && shot[1] != LINEUP) {
                 WatcherApparition.riseNow();
             }
-        } else if (t % STEP == SETTLE - 20 && shot[1] < 0.0F && WatcherApparition.position() != null) {
+        } else if (t % STEP == SETTLE - 20 && shot[1] < 0.0F && shot[1] != LINEUP
+                && WatcherApparition.position() != null) {
             // tide shots: turn to face the Watcher, a second before the picture is taken
             mc.player.lookAt(EntityAnchorArgument.Anchor.EYES, WatcherApparition.position().add(0, 20, 0));
             mc.player.yRotO = mc.player.getYRot();
@@ -105,6 +115,36 @@ public final class DevAutoShot {
             Screenshot.grab(mc.gameDirectory, "ht_" + index + ".png", mc.getMainRenderTarget(), message -> {
             });
         }
+    }
+
+    private static boolean linedUp;
+
+    /** One of each creature, stood in a row across the street, frozen and facing the camera. */
+    private static void lineUp(ServerLevel level) {
+        if (linedUp) {
+            return;
+        }
+        linedUp = true;
+        TownSite.get(level.getChunkSource().getGenerator(), level.getChunkSource().randomState(), level,
+                level.getSeed()).ifPresent(site -> {
+            var types = ModMobs.ENTITIES.getEntries().stream().map(holder -> holder.get()).toList();
+            for (int i = 0; i < types.size(); i++) {
+                Vec3 at = town(site, -17.5F + i * 3.5F, 1, -20);
+                var entity = types.get(i).create(level);
+                if (entity instanceof net.minecraft.world.entity.Mob mob) {
+                    var tag = new net.minecraft.nbt.CompoundTag();
+                    mob.saveWithoutId(tag);
+                    tag.putBoolean("Buried", false);
+                    mob.load(tag);
+                    mob.setNoAi(true);
+                    mob.setPersistenceRequired();
+                    mob.moveTo(at.x, at.y, at.z, site.seaward().getOpposite().toYRot(), 0.0F);
+                    mob.setYHeadRot(site.seaward().getOpposite().toYRot());
+                    mob.setYBodyRot(site.seaward().getOpposite().toYRot());
+                    level.addFreshEntity(mob);
+                }
+            }
+        });
     }
 
     private static Vec3 town(TownSite site, float x, float y, float z) {

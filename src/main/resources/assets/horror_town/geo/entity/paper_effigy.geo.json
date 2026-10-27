@@ -1,0 +1,557 @@
+{
+ "format_version": "1.12.0",
+ "minecraft:geometry": [
+  {
+   "description": {
+    "identifier": "geometry.paper_effigy",
+    "texture_width": 128,
+    "texture_height": 128,
+    "visible_bounds_width": 4,
+    "visible_bounds_height": 4,
+    "visible_bounds_offset": [
+     0,
+     1.5,
+     0
+    ]
+   },
+   "bones": [
+    {
+     "name": "root",
+     "pivot": [
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "name": "body",
+     "parent": "root",
+     "pivot": [
+      0,
+      24,
+      0
+     ]
+    },
+    {
+     "name": "right_leg",
+     "parent": "body",
+     "pivot": [
+      -0.95,
+      24,
+      0
+     ],
+     "cubes": [
+      {
+       "origin": [
+        -1.7,
+        0,
+        -0.75
+       ],
+       "size": [
+        1.5,
+        24,
+        1.5
+       ],
+       "uv": {
+        "north": {
+         "uv": [
+          0,
+          0
+         ],
+         "uv_size": [
+          2,
+          24
+         ]
+        },
+        "south": {
+         "uv": [
+          2,
+          0
+         ],
+         "uv_size": [
+          2,
+          24
+         ]
+        },
+        "east": {
+         "uv": [
+          4,
+          0
+         ],
+         "uv_size": [
+          2,
+          24
+         ]
+        },
+        "west": {
+         "uv": [
+          6,
+          0
+         ],
+         "uv_size": [
+          2,
+          24
+         ]
+        },
+        "up": {
+         "uv": [
+          8,
+          0
+         ],
+         "uv_size": [
+          2,
+          2
+         ]
+        },
+        "down": {
+         "uv": [
+          10,
+          0
+         ],
+         "uv_size": [
+          2,
+          2
+         ]
+        }
+       }
+      }
+     ]
+    },
+    {
+     "name": "left_leg",
+     "parent": "body",
+     "pivot": [
+      0.95,
+      24,
+      0
+     ],
+     "cubes": [
+      {
+       "origin": [
+        0.2,
+        0,
+        -0.75
+       ],
+       "size": [
+        1.5,
+        24,
+        1.5
+       ],
+       "uv": {
+        "north": {
+         "uv": [
+          12,
+          0
+         ],
+         "uv_size": [
+          2,
+          24
+         ]
+        },
+        "south": {
+         "uv": [
+          14,
+          0
+         ],
+         "uv_size": [
+          2,
+          24
+         ]
+        },
+        "east": {
+         "uv": [
+          16,
+          0
+         ],
+         "uv_size": [
+          2,
+          24
+         ]
+        },
+        "west": {
+         "uv": [
+          18,
+          0
+         ],
+         "uv_size": [
+          2,
+          24
+         ]
+        },
+        "up": {
+         "uv": [
+          20,
+          0
+         ],
+         "uv_size": [
+          2,
+          2
+         ]
+        },
+        "down": {
+         "uv": [
+          22,
+          0
+         ],
+         "uv_size": [
+          2,
+          2
+         ]
+        }
+       }
+      }
+     ]
+    },
+    {
+     "name": "torso",
+     "parent": "body",
+     "pivot": [
+      0,
+      24,
+      0
+     ],
+     "cubes": [
+      {
+       "origin": [
+        -4.0,
+        24,
+        -1.0
+       ],
+       "size": [
+        8,
+        16,
+        2
+       ],
+       "uv": {
+        "north": {
+         "uv": [
+          24,
+          0
+         ],
+         "uv_size": [
+          8,
+          16
+         ]
+        },
+        "south": {
+         "uv": [
+          32,
+          0
+         ],
+         "uv_size": [
+          8,
+          16
+         ]
+        },
+        "east": {
+         "uv": [
+          40,
+          0
+         ],
+         "uv_size": [
+          2,
+          16
+         ]
+        },
+        "west": {
+         "uv": [
+          42,
+          0
+         ],
+         "uv_size": [
+          2,
+          16
+         ]
+        },
+        "up": {
+         "uv": [
+          44,
+          0
+         ],
+         "uv_size": [
+          8,
+          2
+         ]
+        },
+        "down": {
+         "uv": [
+          52,
+          0
+         ],
+         "uv_size": [
+          8,
+          2
+         ]
+        }
+       }
+      }
+     ]
+    },
+    {
+     "name": "neck",
+     "parent": "torso",
+     "pivot": [
+      0,
+      40,
+      0
+     ]
+    },
+    {
+     "name": "head",
+     "parent": "neck",
+     "pivot": [
+      0,
+      40,
+      0
+     ],
+     "cubes": [
+      {
+       "origin": [
+        -4.0,
+        40,
+        -1.0
+       ],
+       "size": [
+        8,
+        8,
+        2
+       ],
+       "uv": {
+        "north": {
+         "uv": [
+          60,
+          0
+         ],
+         "uv_size": [
+          8,
+          8
+         ]
+        },
+        "south": {
+         "uv": [
+          68,
+          0
+         ],
+         "uv_size": [
+          8,
+          8
+         ]
+        },
+        "east": {
+         "uv": [
+          76,
+          0
+         ],
+         "uv_size": [
+          2,
+          8
+         ]
+        },
+        "west": {
+         "uv": [
+          78,
+          0
+         ],
+         "uv_size": [
+          2,
+          8
+         ]
+        },
+        "up": {
+         "uv": [
+          80,
+          0
+         ],
+         "uv_size": [
+          8,
+          2
+         ]
+        },
+        "down": {
+         "uv": [
+          88,
+          0
+         ],
+         "uv_size": [
+          8,
+          2
+         ]
+        }
+       }
+      }
+     ]
+    },
+    {
+     "name": "right_arm",
+     "parent": "torso",
+     "pivot": [
+      -5.0,
+      39,
+      0
+     ],
+     "cubes": [
+      {
+       "origin": [
+        -6.0,
+        21,
+        -1.0
+       ],
+       "size": [
+        2,
+        18,
+        2
+       ],
+       "uv": {
+        "north": {
+         "uv": [
+          96,
+          0
+         ],
+         "uv_size": [
+          2,
+          18
+         ]
+        },
+        "south": {
+         "uv": [
+          98,
+          0
+         ],
+         "uv_size": [
+          2,
+          18
+         ]
+        },
+        "east": {
+         "uv": [
+          100,
+          0
+         ],
+         "uv_size": [
+          2,
+          18
+         ]
+        },
+        "west": {
+         "uv": [
+          102,
+          0
+         ],
+         "uv_size": [
+          2,
+          18
+         ]
+        },
+        "up": {
+         "uv": [
+          104,
+          0
+         ],
+         "uv_size": [
+          2,
+          2
+         ]
+        },
+        "down": {
+         "uv": [
+          106,
+          0
+         ],
+         "uv_size": [
+          2,
+          2
+         ]
+        }
+       }
+      }
+     ]
+    },
+    {
+     "name": "left_arm",
+     "parent": "torso",
+     "pivot": [
+      5.0,
+      39,
+      0
+     ],
+     "cubes": [
+      {
+       "origin": [
+        4.0,
+        21,
+        -1.0
+       ],
+       "size": [
+        2,
+        18,
+        2
+       ],
+       "uv": {
+        "north": {
+         "uv": [
+          108,
+          0
+         ],
+         "uv_size": [
+          2,
+          18
+         ]
+        },
+        "south": {
+         "uv": [
+          110,
+          0
+         ],
+         "uv_size": [
+          2,
+          18
+         ]
+        },
+        "east": {
+         "uv": [
+          112,
+          0
+         ],
+         "uv_size": [
+          2,
+          18
+         ]
+        },
+        "west": {
+         "uv": [
+          114,
+          0
+         ],
+         "uv_size": [
+          2,
+          18
+         ]
+        },
+        "up": {
+         "uv": [
+          116,
+          0
+         ],
+         "uv_size": [
+          2,
+          2
+         ]
+        },
+        "down": {
+         "uv": [
+          118,
+          0
+         ],
+         "uv_size": [
+          2,
+          2
+         ]
+        }
+       }
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

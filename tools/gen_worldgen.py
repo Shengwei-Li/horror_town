@@ -98,14 +98,15 @@ def spawn(mob, weight, lo, hi):
     return {"type": mob, "weight": weight, "minCount": lo, "maxCount": hi}
 
 
+# vanilla monsters stay, but thinned out: the Fog Harbor creatures (added per biome) are the main threat
 LAND_MONSTERS = [
-    spawn("minecraft:spider", 100, 4, 4),
-    spawn("minecraft:zombie", 95, 4, 4),
-    spawn("minecraft:skeleton", 70, 4, 4),
-    spawn("minecraft:creeper", 100, 4, 4),
+    spawn("minecraft:spider", 40, 2, 4),
+    spawn("minecraft:zombie", 30, 2, 4),
+    spawn("minecraft:skeleton", 40, 2, 4),
+    spawn("minecraft:creeper", 60, 2, 4),
     spawn("minecraft:enderman", 10, 1, 4),
     spawn("minecraft:witch", 5, 1, 1),
-    spawn("minecraft:drowned", 30, 1, 2),
+    spawn("minecraft:drowned", 10, 1, 2),
 ]
 FARM_ANIMALS = [
     spawn("minecraft:sheep", 12, 4, 4),
@@ -162,8 +163,10 @@ BIOMES = {
         "minecraft:patch_grass_normal", "minecraft:patch_dead_bush",
         "minecraft:brown_mushroom_swamp", "minecraft:patch_pumpkin",
     ], fossils=True), spawners(
-        creature=FARM_ANIMALS + [spawn("minecraft:frog", 10, 2, 5)],
-        monster=LAND_MONSTERS + [spawn("minecraft:slime", 100, 4, 4), spawn("minecraft:bogged", 30, 4, 4)],
+        creature=FARM_ANIMALS + [spawn("minecraft:frog", 10, 2, 5), spawn(f"{MOD}:tooth_snail", 6, 1, 2)],
+        monster=LAND_MONSTERS + [spawn("minecraft:slime", 40, 2, 4), spawn(f"{MOD}:drowned_one", 60, 1, 3),
+                                 spawn(f"{MOD}:mud_lurker", 6, 1, 1), spawn(f"{MOD}:paper_effigy", 20, 1, 1),
+                                 spawn(f"{MOD}:leech_eel", 30, 2, 3), spawn(f"{MOD}:hairless_dog", 10, 1, 1)],
     )),
     # 泥滩: the drowned outer coast — flat black mud as far as the fog lets you see, pools of standing water every
     # few steps, nothing green, only snags and the bones of trees
@@ -173,8 +176,11 @@ BIOMES = {
     }, features([
         "minecraft:glow_lichen", f"{MOD}:dead_tree_rare", "minecraft:patch_dead_bush",
     ], fossils=True, film=True), spawners(
-        creature=[spawn("minecraft:frog", 4, 1, 3)],
-        monster=LAND_MONSTERS + [spawn("minecraft:slime", 60, 2, 4), spawn("minecraft:bogged", 30, 2, 4)],
+        creature=[spawn("minecraft:frog", 4, 1, 3), spawn(f"{MOD}:tooth_snail", 10, 1, 2),
+                  spawn(f"{MOD}:eye_crab", 12, 3, 6)],
+        monster=LAND_MONSTERS + [spawn(f"{MOD}:drowned_one", 80, 2, 3), spawn(f"{MOD}:mud_lurker", 10, 1, 1),
+                                 spawn(f"{MOD}:leech_eel", 60, 2, 4), spawn(f"{MOD}:fishman", 30, 3, 4),
+                                 spawn(f"{MOD}:hairless_dog", 8, 1, 1)],
     )),
     # 盐碱滩: dead white flats where the sea dried out — salt crust, brine pools, bones of trees
     "salt_flats": biome(0.9, {
@@ -183,8 +189,9 @@ BIOMES = {
     }, features([
         "minecraft:glow_lichen", f"{MOD}:dead_tree_rare", "minecraft:patch_dead_bush",
     ], fossils=True), spawners(
-        creature=[spawn("minecraft:rabbit", 4, 2, 3)],
-        monster=LAND_MONSTERS + [spawn("minecraft:husk", 80, 4, 4)],
+        creature=[spawn("minecraft:rabbit", 4, 2, 3), spawn(f"{MOD}:eye_crab", 6, 2, 4)],
+        monster=LAND_MONSTERS + [spawn(f"{MOD}:salt_husk", 100, 2, 4), spawn(f"{MOD}:paper_effigy", 10, 1, 1),
+                                 spawn(f"{MOD}:hairless_dog", 10, 1, 1)],
     ), downfall=0.2),
     # 吊杉林: tall grey trunks standing in black water, hardly a leaf on them
     "drowned_grove": biome(0.5, {
@@ -198,7 +205,8 @@ BIOMES = {
         "minecraft:seagrass_swamp",
     ]), spawners(
         creature=FARM_ANIMALS + [spawn("minecraft:fox", 8, 2, 4)],
-        monster=LAND_MONSTERS,
+        monster=LAND_MONSTERS + [spawn(f"{MOD}:hanged_one", 80, 1, 2), spawn(f"{MOD}:paper_effigy", 20, 1, 1),
+                                 spawn(f"{MOD}:drowned_one", 30, 1, 2)],
     )),
     # 浊海: the grey sea
     "murky_sea": biome(0.5, {
@@ -209,7 +217,7 @@ BIOMES = {
     ]), spawners(
         monster=LAND_MONSTERS + [spawn("minecraft:drowned", 70, 1, 2)],
         water_creature=[spawn("minecraft:squid", 3, 1, 4)],
-        water_ambient=[spawn("minecraft:cod", 15, 3, 6)],
+        water_ambient=[spawn("minecraft:cod", 15, 3, 6), spawn(f"{MOD}:face_fish", 20, 2, 4)],
     ), downfall=0.5),
     # 渊沟: where the sea goes black. Something lives down here.
     "abyssal_trench": biome(0.5, {
@@ -220,7 +228,7 @@ BIOMES = {
     ]), spawners(
         monster=LAND_MONSTERS + [spawn("minecraft:drowned", 100, 1, 3)],
         water_creature=[spawn("minecraft:squid", 1, 1, 2)],
-        water_ambient=[spawn("minecraft:cod", 5, 1, 3)],
+        water_ambient=[spawn("minecraft:cod", 5, 1, 3), spawn(f"{MOD}:face_fish", 5, 1, 2)],
     ), downfall=0.5),
 }
 
