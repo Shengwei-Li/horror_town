@@ -10,6 +10,7 @@ import com.horrortown.registry.ModBlocks;
 import net.minecraft.client.renderer.BiomeColors;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
+import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterDimensionSpecialEffectsEvent;
 
 @EventBusSubscriber(modid = HorrorTownMod.MODID, value = Dist.CLIENT)
@@ -26,6 +27,12 @@ public final class ClientSetup {
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModEntities.TOWNSFOLK.get(), TownsfolkRenderer::new);
         event.registerEntityRenderer(ModEntities.TIDE_MOTHER.get(), TideMotherRenderer::new);
+        event.registerEntityRenderer(ModEntities.WATCHER.get(), WatcherRenderer::new);
+    }
+
+    @SubscribeEvent
+    public static void registerGuiLayers(RegisterGuiLayersEvent event) {
+        ClientSanity.registerLayer(event);
     }
 
     /** The shallow-water film takes the colour of the water around it. */

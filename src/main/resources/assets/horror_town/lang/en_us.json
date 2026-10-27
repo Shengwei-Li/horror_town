@@ -44,5 +44,9 @@
   "block.horror_town.tide_film": "Shallow Water",
   "block.horror_town.rotten_planks": "Rotten Planks",
   "block.horror_town.soaked_planks": "Soaked Planks",
-  "entity.horror_town.tide_mother": "Tide Mother"
+  "entity.horror_town.tide_mother": "Tide Mother",
+  "effect.horror_town.watched": "Watched",
+  "message.horror_town.watched": "Something out at sea is looking at you.",
+  "message.horror_town.tide.start": "A horn sounds far out at sea. The tide is coming in.",
+  "entity.horror_town.watcher": "The Watcher in the Tide"
 }

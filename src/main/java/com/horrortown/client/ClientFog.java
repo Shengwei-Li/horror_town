@@ -36,6 +36,11 @@ public final class ClientFog {
     private static final float SKY_R = 0.56F, SKY_G = 0.60F, SKY_B = 0.58F;
     private static final float BANK_R = 0.70F, BANK_G = 0.73F, BANK_B = 0.71F;
     private static final float MIN_BRIGHTNESS = 0.12F;
+    /** On a tide night the fog goes a sickly green, and never so thick that you cannot see what is out at sea. */
+    private static final float TIDE_R = 0.38F, TIDE_G = 0.52F, TIDE_B = 0.40F;
+    private static final float TIDE_MAX_FOG = 0.2F;
+    private static final float TIDE_NEAR = 40.0F;
+    private static final float TIDE_FAR = 150.0F;
 
     private static final ResourceKey<Biome> DROWNED_GROVE = biome("drowned_grove");
     private static final ResourceKey<Biome> FOG_MARSH = biome("fog_marsh");
@@ -100,10 +105,15 @@ public final class ClientFog {
         if (!active() || event.getType() != FogType.NONE || event.getMode() != FogRenderer.FogMode.FOG_TERRAIN) {
             return;
         }
-        float t = thickness();
+        float t = ClientTide.active() ? Math.min(thickness(), TIDE_MAX_FOG) : thickness();
         float f = t * t * (3.0F - 2.0F * t); // smoothstep
         float far = Mth.lerp(f, HAZE_DISTANCE, BANK_DISTANCE);
         float near = Mth.lerp(f, far * 0.1F, -4.0F);
+        if (ClientTide.active()) {
+            // a tide night: the haze starts further out, so the shape at sea stands out against it
+            far = Math.max(far, TIDE_FAR);
+            near = Math.max(near, TIDE_NEAR);
+        }
         // never push fog further out than vanilla wants it (render distance, blindness, darkness)
         event.setFarPlaneDistance(Math.min(event.getFarPlaneDistance(), far));
         event.setNearPlaneDistance(Math.min(event.getNearPlaneDistance(), near));
@@ -121,8 +131,17 @@ public final class ClientFog {
                 * (1.0F - level.getRainLevel(partialTick) * 0.25F)
                 * (1.0F - level.getThunderLevel(partialTick) * 0.3F);
         float f = Math.min(1.0F, bank * 1.2F);
-        event.setRed(Mth.lerp(f, SKY_R, BANK_R) * light);
-        event.setGreen(Mth.lerp(f, SKY_G, BANK_G) * light);
-        event.setBlue(Mth.lerp(f, SKY_B, BANK_B) * light);
+        float red = Mth.lerp(f, SKY_R, BANK_R);
+        float green = Mth.lerp(f, SKY_G, BANK_G);
+        float blue = Mth.lerp(f, SKY_B, BANK_B);
+        if (ClientTide.active()) {
+            red = TIDE_R;
+            green = TIDE_G;
+            blue = TIDE_B;
+            light = Math.max(light, 0.35F);
+        }
+        event.setRed(red * light);
+        event.setGreen(green * light);
+        event.setBlue(blue * light);
     }
 }

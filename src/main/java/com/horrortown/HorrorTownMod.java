@@ -1,8 +1,10 @@
 package com.horrortown;
 
 import com.horrortown.entity.Townsfolk;
-import com.horrortown.network.FogPayload;
+import com.horrortown.network.ModNetwork;
+import com.horrortown.registry.ModAttachments;
 import com.horrortown.registry.ModBlocks;
+import com.horrortown.registry.ModEffects;
 import com.horrortown.registry.ModEntities;
 import com.horrortown.registry.ModItems;
 import com.horrortown.registry.ModStructures;
@@ -26,7 +28,9 @@ public class HorrorTownMod {
         ModStructures.TYPES.register(modBus);
         ModStructures.PIECES.register(modBus);
         modBus.addListener(this::registerAttributes);
-        modBus.addListener(FogPayload::register);
+        ModAttachments.ATTACHMENTS.register(modBus);
+        ModEffects.EFFECTS.register(modBus);
+        modBus.addListener(ModNetwork::register);
         modBus.addListener(this::addCreativeTabItems);
     }
 

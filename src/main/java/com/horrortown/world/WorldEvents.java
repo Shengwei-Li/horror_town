@@ -2,6 +2,7 @@ package com.horrortown.world;
 
 import com.horrortown.HorrorTownMod;
 import com.horrortown.network.FogPayload;
+import com.horrortown.network.ModNetwork;
 import com.horrortown.town.TownSite;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -32,6 +33,7 @@ public final class WorldEvents {
     public static void onLevelTick(LevelTickEvent.Post event) {
         if (event.getLevel() instanceof ServerLevel level && FogHarbor.is(level)) {
             FogWeather.get(level).tick(level);
+            TideNight.get(level).tick(level);
         }
     }
 
@@ -72,12 +74,18 @@ public final class WorldEvents {
         }
         if (FogHarbor.is(player.serverLevel())) {
             FogWeather.get(player.serverLevel()).sendTo(player);
+            TideNight.get(player.serverLevel()).sendTo(player);
         } else {
             PacketDistributor.sendToPlayer(player, new FogPayload(0.0F));
+            PacketDistributor.sendToPlayer(player, new ModNetwork.TidePayload(false));
         }
+        Sanity.resend(player);
     }
 
-    /** /horrortown fog <level> [seconds] sets the fog for a while; /horrortown fog auto hands it back to the cycle. */
+    /**
+     * /horrortown fog <level> [seconds] sets the fog for a while; /horrortown fog auto hands it back to the cycle.
+     * /horrortown tide start|stop starts or ends a tide night; /horrortown sanity <value> sets your sanity.
+     */
     @SubscribeEvent
     public static void onRegisterCommands(RegisterCommandsEvent event) {
         event.getDispatcher().register(Commands.literal("horrortown")
@@ -90,7 +98,32 @@ public final class WorldEvents {
                                 .then(Commands.argument("seconds", IntegerArgumentType.integer(1))
                                         .executes(ctx -> setFog(ctx.getSource(),
                                                 FloatArgumentType.getFloat(ctx, "level"),
-                                                IntegerArgumentType.getInteger(ctx, "seconds")))))));
+                                                IntegerArgumentType.getInteger(ctx, "seconds"))))))
+                .then(Commands.literal("tide")
+                        .then(Commands.literal("start").executes(ctx -> setTide(ctx.getSource(), true)))
+                        .then(Commands.literal("stop").executes(ctx -> setTide(ctx.getSource(), false))))
+                .then(Commands.literal("sanity")
+                        .then(Commands.argument("value", FloatArgumentType.floatArg(0.0F, Sanity.MAX))
+                                .executes(ctx -> {
+                                    Sanity.set(ctx.getSource().getPlayerOrException(),
+                                            FloatArgumentType.getFloat(ctx, "value"));
+                                    return 1;
+                                }))));
+    }
+
+    private static int setTide(CommandSourceStack source, boolean start) {
+        ServerLevel world = source.getLevel();
+        if (!FogHarbor.is(world)) {
+            source.sendFailure(Component.translatable("commands.horror_town.fog.wrong_world"));
+            return 0;
+        }
+        TideNight tide = TideNight.get(world);
+        if (start) {
+            tide.start(world);
+        } else {
+            tide.end(world, world.getDayTime() / 24000L);
+        }
+        return 1;
     }
 
     private static int setFog(CommandSourceStack source, float level, int seconds) {

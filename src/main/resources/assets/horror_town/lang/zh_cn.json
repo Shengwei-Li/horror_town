@@ -44,5 +44,9 @@
   "block.horror_town.tide_film": "浅水",
   "block.horror_town.rotten_planks": "朽烂木板",
   "block.horror_town.soaked_planks": "水渍木板",
-  "entity.horror_town.tide_mother": "潮母"
+  "entity.horror_town.tide_mother": "潮母",
+  "effect.horror_town.watched": "被注视",
+  "message.horror_town.watched": "海上有什么东西，正看着你。",
+  "message.horror_town.tide.start": "远处传来号角声。潮水在涨。",
+  "entity.horror_town.watcher": "观潮者"
 }

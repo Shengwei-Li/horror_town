@@ -3,6 +3,7 @@ package com.horrortown.registry;
 import com.horrortown.HorrorTownMod;
 import com.horrortown.entity.TideMotherIdol;
 import com.horrortown.entity.Townsfolk;
+import com.horrortown.entity.Watcher;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -27,6 +28,15 @@ public final class ModEntities {
                     .updateInterval(Integer.MAX_VALUE)
                     .fireImmune()
                     .build("tide_mother"));
+
+    /** Client-side only: the apparition at sea on tide nights. Never saved, never sent. */
+    public static final DeferredHolder<EntityType<?>, EntityType<Watcher>> WATCHER = ENTITIES.register("watcher",
+            () -> EntityType.Builder.<Watcher>of(Watcher::new, MobCategory.MISC)
+                    .sized(10.0F, 30.0F)
+                    .noSave()
+                    .noSummon()
+                    .clientTrackingRange(0)
+                    .build("watcher"));
 
     private ModEntities() {
     }

@@ -4,7 +4,9 @@ import com.horrortown.HorrorTownMod;
 import com.horrortown.town.Builder;
 import com.horrortown.town.TownSite;
 import com.horrortown.world.FogWeather;
+import com.horrortown.world.TideNight;
 import net.minecraft.client.Minecraft;
+import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.client.Screenshot;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.core.BlockPos;
@@ -32,19 +34,10 @@ public final class DevAutoShot {
     private static final int STEP = 140;
     private static final int SETTLE = 120;
     /** {time of day, fog, camera x, y, z, target x, y, z} in the town's frame (y from the deck). */
+    /** {time of day, fog (negative: a tide night), camera x, y, z, target x, y, z} in the town's frame. */
     private static final float[][] SHOTS = {
-            {6000, 0.0F, 0, 2, -66, 0, 4, 0},
-            {6000, 0.0F, 0, 2, -30, 0, 3, 20},
-            {6000, 0.0F, 0, 3, 35, 0, 12, 75},
-            {6000, 0.0F, 0, 4, 63, 0, 12, 79},
-            {6000, 0.0F, -30, 40, -80, 0, 0, 10},
-            {6000, 0.0F, -5, 2, 1, -9, 2, -2},
-            {12600, 0.6F, 2, 2, -10, 0, 3, 60},
-            {18000, 0.0F, 0, 2, -30, 0, 3, 20},
-            {18000, 0.0F, 0, 4, 63, 0, 12, 79},
-            {6000, 0.0F, 45, 30, 40, 0, 5, 30},
-            {6000, 0.0F, 0, 9, 66, 0, 11, 79},
-            {18000, 0.0F, 0, 9, 66, 0, 13, 79},
+            {13800, -1.0F, 0, 3, 30, 0, 16, 150},
+            {18000, -1.0F, 0, 3, 30, 0, 16, 150},
     };
 
     private static int ticks;
@@ -82,7 +75,10 @@ public final class DevAutoShot {
             server.execute(() -> {
                 ServerLevel level = server.overworld();
                 level.setDayTime((long) shot[0]);
-                FogWeather.get(level).set(level, shot[1], 1_000_000);
+                FogWeather.get(level).set(level, Math.max(0.0F, shot[1]), 1_000_000);
+                if (shot[1] < 0.0F && !TideNight.get(level).active()) {
+                    TideNight.get(level).start(level);
+                }
                 TownSite.get(level.getChunkSource().getGenerator(), level.getChunkSource().randomState(), level,
                         level.getSeed()).ifPresent(site -> {
                     Vec3 eye = town(site, shot[2], shot[3], shot[4]);
@@ -95,9 +91,17 @@ public final class DevAutoShot {
                     }
                 });
             });
-            ClientFog.forceNow(shot[1]);
+            ClientFog.forceNow(Math.max(0.0F, shot[1]));
+            if (shot[1] < 0.0F) {
+                WatcherApparition.riseNow();
+            }
+        } else if (t % STEP == SETTLE - 20 && shot[1] < 0.0F && WatcherApparition.position() != null) {
+            // tide shots: turn to face the Watcher, a second before the picture is taken
+            mc.player.lookAt(EntityAnchorArgument.Anchor.EYES, WatcherApparition.position().add(0, 20, 0));
+            mc.player.yRotO = mc.player.getYRot();
+            mc.player.xRotO = mc.player.getXRot();
         } else if (t % STEP == SETTLE) {
-            ClientFog.forceNow(shot[1]);
+            ClientFog.forceNow(Math.max(0.0F, shot[1]));
             Screenshot.grab(mc.gameDirectory, "ht_" + index + ".png", mc.getMainRenderTarget(), message -> {
             });
         }
