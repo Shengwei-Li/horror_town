@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "horror_town:barnacle_wood",
+    "horror_town:mildew_plains",
+    "horror_town:sodden_taiga",
+    "horror_town:weeping_crags",
+    "horror_town:brine_waste"
+  ]
+}

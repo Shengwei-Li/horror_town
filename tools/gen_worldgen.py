@@ -33,6 +33,7 @@ def uniform(lo, hi):
 RARITY = lambda chance: {"type": "minecraft:rarity_filter", "chance": chance}
 IN_SQUARE = {"type": "minecraft:in_square"}
 SEA_FLOOR = {"type": "minecraft:heightmap", "heightmap": "OCEAN_FLOOR_WG"}
+SURFACE = {"type": "minecraft:heightmap", "heightmap": "WORLD_SURFACE_WG"}
 IN_BIOME = {"type": "minecraft:biome"}
 
 CONFIGURED = {
@@ -40,6 +41,14 @@ CONFIGURED = {
     "drowned_cypress": {"type": f"{MOD}:drowned_cypress", "config": {}},
     "dead_tree": {"type": f"{MOD}:dead_tree", "config": {}},
     "tide_bones": {"type": f"{MOD}:tide_bones", "config": {}},
+    "barnacle_trunks": {"type": f"{MOD}:barnacle_trunks", "config": {}},
+    "barnacle_rocks": {"type": f"{MOD}:barnacle_rocks", "config": {}},
+    "wrecked_boat": {"type": f"{MOD}:wrecked_boat", "config": {}},
+    "sea_stela": {"type": f"{MOD}:sea_stela", "config": {}},
+    "rotting_hay": {"type": f"{MOD}:rotting_hay", "config": {}},
+    "cave_seep": {"type": f"{MOD}:cave_seep", "config": {}},
+    # 死水塘: stagnant pools in the low ground inland, banked with mud
+    "standing_pool": {"type": f"{MOD}:standing_pool", "config": {}},
 }
 PLACED = {
     "drowned_cypress_sparse": placed(f"{MOD}:drowned_cypress", RARITY(2), IN_SQUARE, SEA_FLOOR, IN_BIOME),
@@ -48,6 +57,28 @@ PLACED = {
     "dead_tree_rare": placed(f"{MOD}:dead_tree", RARITY(3), IN_SQUARE, SEA_FLOOR, IN_BIOME),
     # 潮骨: now and then the skeleton of something huge on the sea floor
     "tide_bones": placed(f"{MOD}:tide_bones", RARITY(10), IN_SQUARE, SEA_FLOOR, IN_BIOME),
+    # inland: barnacles on the trunks and the bare rock, once per chunk from its corner, after the trees
+    "barnacle_trunks": placed(f"{MOD}:barnacle_trunks"),
+    "barnacle_rocks": placed(f"{MOD}:barnacle_rocks"),
+    "wrecked_boat": placed(f"{MOD}:wrecked_boat", RARITY(14), IN_SQUARE, SURFACE, IN_BIOME),
+    "sea_stela_common": placed(f"{MOD}:sea_stela", RARITY(10), IN_SQUARE, SURFACE, IN_BIOME),
+    "sea_stela_rare": placed(f"{MOD}:sea_stela", RARITY(40), IN_SQUARE, SURFACE, IN_BIOME),
+    "rotting_hay": placed(f"{MOD}:rotting_hay", RARITY(5), IN_SQUARE, SURFACE, IN_BIOME),
+    "standing_pool": placed(f"{MOD}:standing_pool", RARITY(6), IN_SQUARE, SURFACE, IN_BIOME),
+    # the sea in the caves: spots in cave air, anywhere from deep down to just under the ground
+    "cave_seep": placed(f"{MOD}:cave_seep", count(40), IN_SQUARE,
+                        {"type": "minecraft:height_range", "height": {"type": "minecraft:uniform",
+                                                                      "min_inclusive": {"above_bottom": 8},
+                                                                      "max_inclusive": {"absolute": 110}}},
+                        {"type": "minecraft:environment_scan", "direction_of_search": "up", "max_steps": 12,
+                         "target_condition": {"type": "minecraft:solid"},
+                         "allowed_search_condition": {"type": "minecraft:matching_blocks", "blocks": "minecraft:air"}},
+                        {"type": "minecraft:random_offset", "xz_spread": 0, "y_spread": -1}, IN_BIOME),
+    # 泣岩: sea water seeping out of the crags, far above any sea
+    "weeping_springs": placed("minecraft:spring_water", count(50), IN_SQUARE,
+                              {"type": "minecraft:height_range", "height": {"type": "minecraft:uniform",
+                                                                            "min_inclusive": {"absolute": 80},
+                                                                            "max_inclusive": {"absolute": 240}}}, IN_BIOME),
     # once per chunk, from the chunk corner
     "tide_film": placed(f"{MOD}:tide_film"),
 }
@@ -55,14 +86,28 @@ PLACED = {
 # One global order for the vegetation step; every biome takes a subsequence so there is never an order cycle.
 VEGETATION_ORDER = [
     f"{MOD}:tide_bones",
+    f"{MOD}:wrecked_boat",
+    f"{MOD}:sea_stela_common",
+    f"{MOD}:sea_stela_rare",
+    f"{MOD}:rotting_hay",
+    "minecraft:forest_rock",
     "minecraft:glow_lichen",
     "minecraft:patch_large_fern",
     f"{MOD}:drowned_cypress_dense",
     f"{MOD}:drowned_cypress_sparse",
     f"{MOD}:dead_tree_common",
     f"{MOD}:dead_tree_rare",
+    "minecraft:trees_birch_and_oak",
+    "minecraft:trees_taiga",
+    "minecraft:trees_plains",
+    "minecraft:flower_plains",
+    "minecraft:flower_default",
+    "minecraft:patch_berry_common",
+    "minecraft:patch_tall_grass",
     "minecraft:patch_grass_taiga",
     "minecraft:patch_grass_normal",
+    "minecraft:patch_grass_plain",
+    "minecraft:patch_grass_forest",
     "minecraft:patch_dead_bush",
     "minecraft:patch_waterlily",
     "minecraft:brown_mushroom_swamp",
@@ -70,12 +115,15 @@ VEGETATION_ORDER = [
     "minecraft:brown_mushroom_normal",
     "minecraft:red_mushroom_normal",
     "minecraft:patch_sugar_cane_swamp",
+    "minecraft:patch_sugar_cane",
     "minecraft:patch_pumpkin",
     "minecraft:seagrass_swamp",
     "minecraft:seagrass_normal",
     "minecraft:seagrass_deep",
     "minecraft:seagrass_simple",
     "minecraft:kelp_cold",
+    f"{MOD}:barnacle_trunks",
+    f"{MOD}:barnacle_rocks",
 ]
 
 
@@ -85,9 +133,15 @@ def ordered(names):
     return [n for n in VEGETATION_ORDER if n in names]
 
 
-def features(vegetation, fossils=False, film=False):
+def features(vegetation, fossils=False, film=False, pools=False, seeps=False, springs=False):
     mangrove = json.loads((VANILLA / "worldgen/biome/mangrove_swamp.json").read_text())
     steps = copy.deepcopy(mangrove["features"])
+    if pools:
+        steps[1] = [f"{MOD}:standing_pool"] + steps[1]
+    if seeps:
+        steps[7] = [f"{MOD}:cave_seep"] + steps[7]
+    if springs:
+        steps[8] = [f"{MOD}:weeping_springs"] + steps[8]
     if film:
         steps[10] = [f"{MOD}:tide_film"] + steps[10]
     steps[3] = (["minecraft:fossil_upper", "minecraft:fossil_lower"] if fossils else []) + [
@@ -111,6 +165,17 @@ LAND_MONSTERS = [
     spawn("minecraft:enderman", 10, 1, 4),
     spawn("minecraft:witch", 5, 1, 1),
     spawn("minecraft:drowned", 10, 1, 2),
+]
+# inland, away from the sea, the ordinary monsters at their ordinary numbers; the island's own things are rarer
+INLAND_MONSTERS = [
+    spawn("minecraft:spider", 100, 4, 4),
+    spawn("minecraft:zombie", 95, 4, 4),
+    spawn("minecraft:zombie_villager", 10, 1, 1),
+    spawn("minecraft:skeleton", 100, 4, 4),
+    spawn("minecraft:creeper", 100, 4, 4),
+    spawn("minecraft:slime", 100, 4, 4),
+    spawn("minecraft:enderman", 10, 1, 4),
+    spawn("minecraft:witch", 5, 1, 1),
 ]
 FARM_ANIMALS = [
     spawn("minecraft:sheep", 12, 4, 4),
@@ -212,6 +277,72 @@ BIOMES = {
         monster=LAND_MONSTERS + [spawn(f"{MOD}:hanged_one", 80, 1, 2), spawn(f"{MOD}:paper_effigy", 20, 1, 1),
                                  spawn(f"{MOD}:drowned_one", 30, 1, 2)],
     )),
+    # ------------------------------------------------ the transition belt and the interior
+    # 盐碱荒原: behind the marsh the land dries out: cracked mud and salt, dead reeds, boats left where the sea
+    # went out from under them, and old steles put up to keep it out
+    "brine_waste": biome(0.8, {
+        "water_color": 0x46544C, "water_fog_color": 0x283230,
+        "grass_color": 0x857B5C, "foliage_color": 0x766C50,
+    }, features([
+        f"{MOD}:wrecked_boat", f"{MOD}:sea_stela_common", "minecraft:glow_lichen", f"{MOD}:dead_tree_rare",
+        "minecraft:patch_grass_plain", "minecraft:patch_dead_bush",
+    ], fossils=True, seeps=True), spawners(
+        creature=[spawn("minecraft:rabbit", 6, 2, 3), spawn(f"{MOD}:eye_crab", 4, 1, 3)],
+        monster=LAND_MONSTERS + [spawn(f"{MOD}:salt_husk", 60, 2, 3), spawn(f"{MOD}:hairless_dog", 20, 1, 2),
+                                 spawn(f"{MOD}:paper_effigy", 15, 1, 1)],
+    ), downfall=0.3),
+    # 藤壶林: oak and birch woods far inland, barnacles crusted round the feet of every trunk, standing water
+    "barnacle_wood": biome(0.6, {
+        "water_color": 0x2C3A30, "water_fog_color": 0x18201A,
+        "grass_color": 0x66704C, "foliage_color": 0x56603F,
+        "particle": {"options": {"type": "minecraft:white_ash"}, "probability": 0.002},
+    }, features([
+        "minecraft:forest_rock", "minecraft:glow_lichen", f"{MOD}:dead_tree_rare", "minecraft:trees_birch_and_oak",
+        "minecraft:flower_default", "minecraft:patch_grass_forest", "minecraft:brown_mushroom_normal",
+        "minecraft:red_mushroom_normal",
+        f"{MOD}:barnacle_trunks",
+    ], pools=True, seeps=True), spawners(
+        creature=FARM_ANIMALS + [spawn("minecraft:fox", 6, 2, 3), spawn("minecraft:wolf", 4, 2, 4)],
+        monster=INLAND_MONSTERS + [spawn(f"{MOD}:hanged_one", 20, 1, 1), spawn(f"{MOD}:hairless_dog", 10, 1, 2),
+                                   spawn(f"{MOD}:paper_effigy", 5, 1, 1)],
+    )),
+    # 霉原: open farmland nobody works any more: wet grass, mould, stagnant pools, haystacks gone black
+    "mildew_plains": biome(0.7, {
+        "water_color": 0x36402E, "water_fog_color": 0x1E241A,
+        "grass_color": 0x76784E, "foliage_color": 0x646640,
+    }, features([
+        f"{MOD}:sea_stela_rare", f"{MOD}:rotting_hay", "minecraft:glow_lichen", f"{MOD}:dead_tree_rare",
+        "minecraft:trees_plains", "minecraft:flower_plains", "minecraft:patch_tall_grass",
+        "minecraft:patch_grass_plain", "minecraft:brown_mushroom_normal", "minecraft:patch_pumpkin",
+        "minecraft:patch_sugar_cane",
+        f"{MOD}:barnacle_trunks",
+    ], pools=True, seeps=True), spawners(
+        creature=FARM_ANIMALS + [spawn("minecraft:horse", 2, 2, 4), spawn(f"{MOD}:tooth_snail", 6, 1, 2)],
+        monster=INLAND_MONSTERS + [spawn(f"{MOD}:paper_effigy", 20, 1, 1), spawn(f"{MOD}:hairless_dog", 10, 1, 2)],
+    )),
+    # 湿杉林: dark spruce dripping with lichen, the ground soft with needles and moss; things hang from the branches
+    "sodden_taiga": biome(0.3, {
+        "water_color": 0x1F2A26, "water_fog_color": 0x101614,
+        "grass_color": 0x58644A, "foliage_color": 0x48543E,
+    }, features([
+        "minecraft:forest_rock", "minecraft:glow_lichen", "minecraft:patch_large_fern", f"{MOD}:dead_tree_common",
+        "minecraft:trees_taiga", "minecraft:patch_berry_common", "minecraft:patch_grass_taiga",
+        "minecraft:brown_mushroom_normal", "minecraft:red_mushroom_normal", f"{MOD}:barnacle_trunks",
+    ], pools=True, seeps=True), spawners(
+        creature=FARM_ANIMALS + [spawn("minecraft:wolf", 8, 4, 4), spawn("minecraft:fox", 8, 2, 4)],
+        monster=INLAND_MONSTERS + [spawn(f"{MOD}:hanged_one", 25, 1, 1), spawn(f"{MOD}:hairless_dog", 12, 1, 2)],
+    )),
+    # 泣岩山: the island's mountains, grey rock that weeps sea water from every crack, barnacles high on the crags
+    "weeping_crags": biome(0.4, {
+        "water_color": 0x2A3A3C, "water_fog_color": 0x141E20,
+        "grass_color": 0x606A50, "foliage_color": 0x505A42,
+    }, features([
+        "minecraft:glow_lichen", f"{MOD}:dead_tree_rare", "minecraft:patch_grass_taiga", f"{MOD}:barnacle_rocks",
+    ], seeps=True, springs=True), spawners(
+        creature=[spawn("minecraft:goat", 5, 1, 3), spawn("minecraft:rabbit", 4, 2, 3)],
+        monster=INLAND_MONSTERS + [spawn(f"{MOD}:salt_husk", 10, 1, 2), spawn(f"{MOD}:hanged_one", 8, 1, 1),
+                                   spawn(f"{MOD}:hairless_dog", 8, 1, 2)],
+    ), downfall=0.6),
     # 浊海: the grey sea
     "murky_sea": biome(0.5, {
         "water_color": 0x1F2A2B, "water_fog_color": 0x10181A,
@@ -243,15 +374,18 @@ BIOMES = {
 FULL = [-2.0, 2.0]
 
 
-def point(name, humidity=FULL, continentalness=FULL):
+def point(name, humidity=FULL, continentalness=FULL, temperature=FULL, erosion=FULL):
     return {"biome": f"{MOD}:{name}", "parameters": {
-        "temperature": FULL, "humidity": humidity, "continentalness": continentalness,
-        "erosion": FULL, "weirdness": FULL, "depth": [0.0, 1.0], "offset": 0.0}}
+        "temperature": temperature, "humidity": humidity, "continentalness": continentalness,
+        "erosion": erosion, "weirdness": FULL, "depth": [0.0, 1.0], "offset": 0.0}}
 
 
 OUTER_COAST = [-0.19, 0.0]
 NEAR_INLAND = [0.0, 0.12]
-INLAND = [0.12, 2.0]
+TRANSITION = [0.12, 0.22]
+INLAND = [0.22, 2.0]
+MOUNTAINS = [-2.0, -0.5]
+LOWLAND = [-0.5, 2.0]
 BIOME_SOURCE = {"type": "minecraft:multi_noise", "biomes": [
     point("abyssal_trench", continentalness=[-2.0, -0.75]),
     point("murky_sea", continentalness=[-0.75, -0.19]),
@@ -260,10 +394,16 @@ BIOME_SOURCE = {"type": "minecraft:multi_noise", "biomes": [
     # behind them the marsh, with patches of dry salt flats
     point("salt_flats", humidity=[-2.0, -0.4], continentalness=NEAR_INLAND),
     point("fog_marsh", humidity=[-0.4, 2.0], continentalness=NEAR_INLAND),
-    # further in the drowned groves start
-    point("salt_flats", humidity=[-2.0, -0.35], continentalness=INLAND),
-    point("fog_marsh", humidity=[-0.35, 0.1], continentalness=INLAND),
-    point("drowned_grove", humidity=[0.1, 2.0], continentalness=INLAND),
+    # further in, the transition belt: the drowned groves where it is still wet, the land drying out elsewhere
+    point("salt_flats", humidity=[-2.0, -0.35], continentalness=TRANSITION),
+    point("brine_waste", humidity=[-0.35, 0.1], continentalness=TRANSITION),
+    point("drowned_grove", humidity=[0.1, 2.0], continentalness=TRANSITION),
+    # the interior: crags where vanilla would raise mountains, and woods, taiga and old fields between them
+    point("weeping_crags", continentalness=INLAND, erosion=MOUNTAINS),
+    point("brine_waste", humidity=[-2.0, -0.45], continentalness=INLAND, erosion=LOWLAND),
+    point("mildew_plains", humidity=[-0.45, 0.05], continentalness=INLAND, erosion=LOWLAND),
+    point("barnacle_wood", humidity=[0.05, 2.0], temperature=[-0.15, 2.0], continentalness=INLAND, erosion=LOWLAND),
+    point("sodden_taiga", humidity=[0.05, 2.0], temperature=[-2.0, -0.15], continentalness=INLAND, erosion=LOWLAND),
 ]}
 
 # ---------------------------------------------------------------- surface rules
@@ -375,6 +515,43 @@ MOD_SURFACE = seq(
         )),
         cond(UNDER_FLOOR, block("minecraft:mud")),
     )),
+    cond(biome_is("brine_waste"), seq(
+        cond(FLOOR, seq(
+            cond(noise("minecraft:surface", 0.35), block("minecraft:coarse_dirt")),
+            cond(noise("minecraft:surface", -0.05, 0.12), block(SALT)),
+            cond(noise("minecraft:surface", -0.45, -0.3), block("minecraft:tuff")),
+            block("minecraft:packed_mud"),
+        )),
+        cond(UNDER_FLOOR, block("minecraft:dirt")),
+    )),
+    cond(biome_is("barnacle_wood"), cond(FLOOR, seq(
+        cond(noise("minecraft:surface", 0.3), block("minecraft:moss_block")),
+        cond(noise("minecraft:surface", -0.3, -0.12), block("minecraft:podzol")),
+        cond(noise("minecraft:surface", -0.5, -0.42), block("minecraft:mud")),
+        block("minecraft:grass_block"),
+    ))),
+    cond(biome_is("mildew_plains"), cond(FLOOR, seq(
+        cond(noise("minecraft:surface", 0.42), block("minecraft:moss_block")),
+        cond(noise("minecraft:surface", -0.2, -0.1), block("minecraft:coarse_dirt")),
+        cond(noise("minecraft:surface", -0.5, -0.4), block("minecraft:mud")),
+        block("minecraft:grass_block"),
+    ))),
+    cond(biome_is("sodden_taiga"), cond(FLOOR, seq(
+        cond(noise("minecraft:surface", 0.25), block("minecraft:moss_block")),
+        cond(noise("minecraft:surface", -0.4, -0.2), block("minecraft:coarse_dirt")),
+        block("minecraft:podzol"),
+    ))),
+    # the crags: bare weathered rock up high, wet moss and gravel lower down
+    cond(biome_is("weeping_crags"), cond(FLOOR, seq(
+        cond(y_above(120), seq(
+            cond(noise("minecraft:surface", 0.2), block("minecraft:tuff")),
+            cond(noise("minecraft:surface", -0.1, 0.05), block("minecraft:calcite")),
+            block("minecraft:stone"),
+        )),
+        cond(noise("minecraft:surface", 0.3), block("minecraft:gravel")),
+        cond(noise("minecraft:surface", -0.2, 0.0), block("minecraft:moss_block")),
+        block("minecraft:grass_block"),
+    ))),
     cond(biome_is("murky_sea", "abyssal_trench"), seq(
         cond(FLOOR, seq(
             cond(biome_is("abyssal_trench"), seq(
@@ -500,7 +677,8 @@ WORLD_PRESET = {"dimensions": {
 
 # ---------------------------------------------------------------- tags
 
-LAND = ["mud_flats", "fog_marsh", "salt_flats", "drowned_grove"]
+LAND = ["mud_flats", "fog_marsh", "salt_flats", "drowned_grove", "brine_waste", "barnacle_wood", "mildew_plains",
+        "sodden_taiga", "weeping_crags"]
 SEA = ["murky_sea", "abyssal_trench"]
 ALL = LAND + SEA
 
@@ -509,14 +687,23 @@ BIOME_TAGS = {
     "stronghold_biased_to": LAND,
     "is_ocean": SEA,
     "is_deep_ocean": ["abyssal_trench"],
-    "is_forest": ["drowned_grove"],
+    "is_forest": ["drowned_grove", "barnacle_wood", "sodden_taiga"],
+    "is_taiga": ["sodden_taiga"],
+    "is_mountain": ["weeping_crags"],
+    "is_hill": ["weeping_crags"],
     "allows_surface_slime_spawns": ["fog_marsh", "mud_flats"],
     "water_on_map_outlines": ["fog_marsh", "mud_flats"],
     "has_structure/mineshaft": ALL,
     "has_structure/ruined_portal_swamp": LAND,
     "has_structure/ruined_portal_ocean": SEA,
     "has_structure/shipwreck": SEA,
-    "has_structure/shipwreck_beached": ["mud_flats", "salt_flats"],
+    "has_structure/shipwreck_beached": ["mud_flats", "salt_flats", "brine_waste"],
+    "has_structure/trail_ruins": ["barnacle_wood", "sodden_taiga"],
+    "has_structure/village_plains": ["mildew_plains"],
+    "has_structure/village_taiga": ["sodden_taiga"],
+    "has_structure/ruined_portal_standard": ["barnacle_wood", "mildew_plains", "sodden_taiga"],
+    "has_structure/ruined_portal_mountain": ["weeping_crags"],
+    "has_structure/trial_chambers": ["barnacle_wood", "mildew_plains", "sodden_taiga", "weeping_crags", "brine_waste"],
     "has_structure/ocean_ruin_cold": SEA,
     "has_structure/buried_treasure": ["mud_flats", "salt_flats"],
     "has_structure/swamp_hut": ["fog_marsh"],

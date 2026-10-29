@@ -4,6 +4,7 @@ import com.horrortown.HorrorTownMod;
 import com.horrortown.world.FogHarbor;
 import com.horrortown.entity.boss.TideMotherTrue;
 import com.horrortown.registry.ModGear;
+import com.horrortown.world.Sanity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.FogRenderer;
@@ -133,6 +134,13 @@ public final class ClientFog {
             near = Math.max(near, MOTHER_NEAR);
         }
         Player player = Minecraft.getInstance().player;
+        if (player != null) {
+            // away from the sea the fog lifts: from the coast to the middle of the island you see up to twice as far
+            double r = Math.sqrt(player.getX() * player.getX() + player.getZ() * player.getZ());
+            float inland = (float) Mth.clamp((Sanity.COAST_RADIUS - r) / 700.0, 0.0, 1.0);
+            far *= 1.0F + inland;
+            near *= 1.0F + inland;
+        }
         if (player != null && ModGear.veiled(player)) {
             // through her veil the fog thins
             far = far * VEIL_SIGHT + 16.0F;

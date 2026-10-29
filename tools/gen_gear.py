@@ -254,6 +254,12 @@ NAMES = {
     "block.horror_town.soul_lamp": ("引魂灯", "Soul Lamp"),
     "item.horror_town.tide_glass": ("窥潮镜", "Tide Glass"),
     "effect.horror_town.bound": ("镇住", "Bound"),
+    "block.horror_town.barnacles": ("藤壶", "Barnacles"),
+    "biome.horror_town.brine_waste": ("盐碱荒原", "Brine Waste"),
+    "biome.horror_town.barnacle_wood": ("藤壶林", "Barnacle Wood"),
+    "biome.horror_town.mildew_plains": ("霉原", "Mildew Plains"),
+    "biome.horror_town.sodden_taiga": ("湿杉林", "Sodden Taiga"),
+    "biome.horror_town.weeping_crags": ("泣岩山", "Weeping Crags"),
 }
 GONE = ["item.horror_town.tide_scale_helmet", "item.horror_town.tide_scale_chestplate",
         "item.horror_town.tide_scale_leggings", "item.horror_town.tide_scale_boots"]
@@ -269,7 +275,33 @@ def lang():
         write(path, d)
 
 
+def barnacles():
+    """藤壶: a multiface block like glow lichen, so its blockstate and loot are the vanilla lichen's, renamed."""
+    img = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    px = img.load()
+    for cx, cy, r in ((3, 3, 2), (10, 2, 1), (12, 6, 2), (5, 9, 2), (2, 13, 1), (9, 12, 2), (14, 13, 1), (8, 6, 1)):
+        for y in range(cy - r, cy + r + 1):
+            for x in range(cx - r, cx + r + 1):
+                if 0 <= x < 16 and 0 <= y < 16 and (x - cx) ** 2 + (y - cy) ** 2 <= r * r + 0.5:
+                    d = ((x - cx) ** 2 + (y - cy) ** 2) ** 0.5
+                    v = 60 if d < 0.6 and r > 1 else 222 - int(d * 30) + rng.randint(-10, 10)
+                    px[x, y] = (v, v - 4, v - 14, 255)
+    img.save(BLOCK_TEX / "barnacles.png")
+    vanilla = Path(__file__).resolve().parent / "vanilla_refs"
+    state = (vanilla / "glow_lichen_blockstate.json").read_text().replace("minecraft:block/glow_lichen", f"{M}:block/barnacles")
+    write(ROOT / "blockstates/barnacles.json", json.loads(state))
+    write(ROOT / "models/block/barnacles.json", {"render_type": "minecraft:cutout", "ambientocclusion": False,
+                                                 "textures": {"particle": f"{M}:block/barnacles", "barnacles": f"{M}:block/barnacles"},
+                                                 "elements": [{"from": [0, 0, 0.1], "to": [16, 16, 0.1], "faces": {
+                                                     "north": {"uv": [16, 0, 0, 16], "texture": "#barnacles"},
+                                                     "south": {"uv": [0, 0, 16, 16], "texture": "#barnacles"}}}]})
+    write(ROOT / "models/item/barnacles.json", {"parent": "minecraft:item/generated", "textures": {"layer0": f"{M}:block/barnacles"}})
+    loot = (vanilla / "glow_lichen_loot.json").read_text().replace("minecraft:glow_lichen", f"{M}:barnacles")
+    write(DATA / M / "loot_table/blocks/barnacles.json", json.loads(loot))
+
+
 textures()
+barnacles()
 models()
 data()
 lang()

@@ -43,8 +43,11 @@ public final class DevAutoShot {
     /** A fog value that means: in creative, third person, holding up the Tide Mother's staff and drawing swords. */
     private static final float STAFF = -4.0F;
     private static final float[][] SHOTS = {
-            {6000, STAFF, 0, 2, 4, 6, 2, 30},
-            {6000, STAFF, 0, 2, 4, 6, 2, 30},
+            // inland from the town: the transition belt, then the interior (camera high, looking down and on)
+            {6000, 0.0F, 0, 12, -500, 0, 2, -560},
+            {6000, 0.0F, 0, 14, -1000, 0, 2, -1070},
+            {6000, 0.0F, 300, 14, -1300, 300, 2, -1370},
+            {6000, 0.0F, -300, 14, -1500, -300, 2, -1570},
     };
 
     private static int ticks;
@@ -56,6 +59,11 @@ public final class DevAutoShot {
     public static void onClientTick(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         IntegratedServer server = mc.getSingleplayerServer();
+        if (ENABLED && ticks > 0 && (mc.level == null || server == null)) {
+            // the world went away under us (the server crashed): quit instead of sitting on a black screen
+            mc.stop();
+            return;
+        }
         if (!ENABLED || mc.level == null || mc.player == null || server == null) {
             return;
         }
@@ -70,6 +78,16 @@ public final class DevAutoShot {
         }
         int index = t / STEP;
         if (index >= SHOTS.length) {
+            // saving after a run that generated far-off chunks can hang; never leave a black window behind
+            Thread watchdog = new Thread(() -> {
+                try {
+                    Thread.sleep(30_000L);
+                } catch (InterruptedException ignored) {
+                }
+                Runtime.getRuntime().halt(0);
+            }, "Horror Town autoshot watchdog");
+            watchdog.setDaemon(true);
+            watchdog.start();
             mc.stop();
             return;
         }
@@ -96,7 +114,13 @@ public final class DevAutoShot {
                 TownSite.get(level.getChunkSource().getGenerator(), level.getChunkSource().randomState(), level,
                         level.getSeed()).ifPresent(site -> {
                     Vec3 eye = town(site, shot[2], shot[3], shot[4]);
-                    Vec3 look = town(site, shot[5], shot[6], shot[7]).subtract(eye);
+                    Vec3 at = town(site, shot[5], shot[6], shot[7]);
+                    if (shot[4] < -200) {
+                        // far inland the ground is anywhere: heights there are above the ground, not the deck
+                        eye = overGround(level, eye, shot[3]);
+                        at = overGround(level, at, shot[6]);
+                    }
+                    Vec3 look = at.subtract(eye);
                     if (shot[2] >= 1000 && motherAt != null) {
                         // 1000: from her side, out over the water; 1001: from above, looking down on her slam
                         Vec3 side = Vec3.atLowerCornerOf(site.seaward().getClockWise().getNormal());
@@ -217,6 +241,15 @@ public final class DevAutoShot {
                 return;
             }
         });
+    }
+
+    private static Vec3 overGround(ServerLevel level, Vec3 pos, float above) {
+        int x = Mth.floor(pos.x);
+        int z = Mth.floor(pos.z);
+        // generate the chunk first: an ungenerated one reports the bottom of the world
+        int ground = level.getChunk(x >> 4, z >> 4).getHeight(
+                net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE, x & 15, z & 15) + 1;
+        return new Vec3(pos.x, ground + above, pos.z);
     }
 
     private static Vec3 town(TownSite site, float x, float y, float z) {

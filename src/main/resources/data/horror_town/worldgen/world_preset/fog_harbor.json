@@ -170,7 +170,7 @@
                 ],
                 "continentalness": [
                   0.12,
-                  2.0
+                  0.22
                 ],
                 "erosion": [
                   -2.0,
@@ -188,7 +188,7 @@
               }
             },
             {
-              "biome": "horror_town:fog_marsh",
+              "biome": "horror_town:brine_waste",
               "parameters": {
                 "temperature": [
                   -2.0,
@@ -200,7 +200,7 @@
                 ],
                 "continentalness": [
                   0.12,
-                  2.0
+                  0.22
                 ],
                 "erosion": [
                   -2.0,
@@ -230,10 +230,160 @@
                 ],
                 "continentalness": [
                   0.12,
+                  0.22
+                ],
+                "erosion": [
+                  -2.0,
+                  2.0
+                ],
+                "weirdness": [
+                  -2.0,
+                  2.0
+                ],
+                "depth": [
+                  0.0,
+                  1.0
+                ],
+                "offset": 0.0
+              }
+            },
+            {
+              "biome": "horror_town:weeping_crags",
+              "parameters": {
+                "temperature": [
+                  -2.0,
+                  2.0
+                ],
+                "humidity": [
+                  -2.0,
+                  2.0
+                ],
+                "continentalness": [
+                  0.22,
                   2.0
                 ],
                 "erosion": [
                   -2.0,
+                  -0.5
+                ],
+                "weirdness": [
+                  -2.0,
+                  2.0
+                ],
+                "depth": [
+                  0.0,
+                  1.0
+                ],
+                "offset": 0.0
+              }
+            },
+            {
+              "biome": "horror_town:brine_waste",
+              "parameters": {
+                "temperature": [
+                  -2.0,
+                  2.0
+                ],
+                "humidity": [
+                  -2.0,
+                  -0.45
+                ],
+                "continentalness": [
+                  0.22,
+                  2.0
+                ],
+                "erosion": [
+                  -0.5,
+                  2.0
+                ],
+                "weirdness": [
+                  -2.0,
+                  2.0
+                ],
+                "depth": [
+                  0.0,
+                  1.0
+                ],
+                "offset": 0.0
+              }
+            },
+            {
+              "biome": "horror_town:mildew_plains",
+              "parameters": {
+                "temperature": [
+                  -2.0,
+                  2.0
+                ],
+                "humidity": [
+                  -0.45,
+                  0.05
+                ],
+                "continentalness": [
+                  0.22,
+                  2.0
+                ],
+                "erosion": [
+                  -0.5,
+                  2.0
+                ],
+                "weirdness": [
+                  -2.0,
+                  2.0
+                ],
+                "depth": [
+                  0.0,
+                  1.0
+                ],
+                "offset": 0.0
+              }
+            },
+            {
+              "biome": "horror_town:barnacle_wood",
+              "parameters": {
+                "temperature": [
+                  -0.15,
+                  2.0
+                ],
+                "humidity": [
+                  0.05,
+                  2.0
+                ],
+                "continentalness": [
+                  0.22,
+                  2.0
+                ],
+                "erosion": [
+                  -0.5,
+                  2.0
+                ],
+                "weirdness": [
+                  -2.0,
+                  2.0
+                ],
+                "depth": [
+                  0.0,
+                  1.0
+                ],
+                "offset": 0.0
+              }
+            },
+            {
+              "biome": "horror_town:sodden_taiga",
+              "parameters": {
+                "temperature": [
+                  -2.0,
+                  -0.15
+                ],
+                "humidity": [
+                  0.05,
+                  2.0
+                ],
+                "continentalness": [
+                  0.22,
+                  2.0
+                ],
+                "erosion": [
+                  -0.5,
                   2.0
                 ],
                 "weirdness": [

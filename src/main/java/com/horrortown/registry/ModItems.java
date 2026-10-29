@@ -13,6 +13,7 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> ROT_MUD = ITEMS.registerSimpleBlockItem(ModBlocks.ROT_MUD);
     public static final DeferredItem<BlockItem> SALT_CRUST = ITEMS.registerSimpleBlockItem(ModBlocks.SALT_CRUST);
     public static final DeferredItem<BlockItem> ROTWOOD_LOG = ITEMS.registerSimpleBlockItem(ModBlocks.ROTWOOD_LOG);
+    public static final DeferredItem<BlockItem> BARNACLES = ITEMS.registerSimpleBlockItem(ModBlocks.BARNACLES);
 
     public static final DeferredItem<BlockItem> ROTTEN_PLANKS = ITEMS.registerSimpleBlockItem(ModBlocks.ROTTEN_PLANKS);
     public static final DeferredItem<BlockItem> SOAKED_PLANKS = ITEMS.registerSimpleBlockItem(ModBlocks.SOAKED_PLANKS);

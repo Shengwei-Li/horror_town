@@ -102,6 +102,9 @@ public final class Sanity {
         // her staff in your hand halves it all; a soul lamp keeps off most of what the dark does
         float shield = TideStaffItem.carried(player) ? 0.5F : 1.0F;
         float dark = ModGear.carriesLamp(player) ? 0.4F : 1.0F;
+        if (!onCoast) {
+            dark *= 0.5F; // inland, away from the sea, the dark is only the dark
+        }
         if (watched) {
             sanity -= 0.8F * shield;
         } else if (night && underSky && lamplight < 8) {

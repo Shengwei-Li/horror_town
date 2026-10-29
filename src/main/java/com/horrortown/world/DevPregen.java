@@ -29,13 +29,18 @@ public final class DevPregen {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final int HALF_SIZE = 3600;
     private static final int STEP = 32;
-    private static final Map<String, Integer> COLOURS = Map.of(
-            "mud_flats", 0x3A3528,
-            "fog_marsh", 0x5E6B45,
-            "salt_flats", 0xD8D4C4,
-            "drowned_grove", 0x2F4A2A,
-            "murky_sea", 0x2A4652,
-            "abyssal_trench", 0x0E1C26);
+    private static final Map<String, Integer> COLOURS = Map.ofEntries(
+            Map.entry("mud_flats", 0x3A3528),
+            Map.entry("fog_marsh", 0x5E6B45),
+            Map.entry("salt_flats", 0xD8D4C4),
+            Map.entry("drowned_grove", 0x2F4A2A),
+            Map.entry("brine_waste", 0xA89A72),
+            Map.entry("barnacle_wood", 0x4E7A3A),
+            Map.entry("mildew_plains", 0x9AA060),
+            Map.entry("sodden_taiga", 0x2A4A40),
+            Map.entry("weeping_crags", 0x8A8A8A),
+            Map.entry("murky_sea", 0x2A4652),
+            Map.entry("abyssal_trench", 0x0E1C26));
 
     private DevPregen() {
     }

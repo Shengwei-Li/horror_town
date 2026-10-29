@@ -109,5 +109,11 @@
   "block.horror_town.salt_line": "Salt Line",
   "block.horror_town.soul_lamp": "Soul Lamp",
   "item.horror_town.tide_glass": "Tide Glass",
-  "effect.horror_town.bound": "Bound"
+  "effect.horror_town.bound": "Bound",
+  "block.horror_town.barnacles": "Barnacles",
+  "biome.horror_town.brine_waste": "Brine Waste",
+  "biome.horror_town.barnacle_wood": "Barnacle Wood",
+  "biome.horror_town.mildew_plains": "Mildew Plains",
+  "biome.horror_town.sodden_taiga": "Sodden Taiga",
+  "biome.horror_town.weeping_crags": "Weeping Crags"
 }

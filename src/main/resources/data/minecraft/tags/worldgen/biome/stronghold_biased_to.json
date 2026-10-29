@@ -4,6 +4,11 @@
     "horror_town:mud_flats",
     "horror_town:fog_marsh",
     "horror_town:salt_flats",
-    "horror_town:drowned_grove"
+    "horror_town:drowned_grove",
+    "horror_town:brine_waste",
+    "horror_town:barnacle_wood",
+    "horror_town:mildew_plains",
+    "horror_town:sodden_taiga",
+    "horror_town:weeping_crags"
   ]
 }

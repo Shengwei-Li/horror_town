@@ -1,6 +1,7 @@
 package com.horrortown.registry;
 
 import com.horrortown.HorrorTownMod;
+import com.horrortown.block.BarnacleBlock;
 import com.horrortown.block.RotMudBlock;
 import com.horrortown.block.TideFilmBlock;
 import net.minecraft.world.level.block.Block;
@@ -40,6 +41,11 @@ public final class ModBlocks {
     public static final DeferredBlock<TideFilmBlock> TIDE_FILM = BLOCKS.registerBlock("tide_film", TideFilmBlock::new,
             BlockBehaviour.Properties.of().mapColor(MapColor.WATER).replaceable().noCollission().noOcclusion()
                     .instabreak().sound(SoundType.EMPTY).noLootTable().pushReaction(PushReaction.DESTROY));
+
+    /** 藤壶 */
+    public static final DeferredBlock<BarnacleBlock> BARNACLES = BLOCKS.registerBlock("barnacles", BarnacleBlock::new,
+            BlockBehaviour.Properties.of().mapColor(MapColor.TERRACOTTA_WHITE).replaceable().noCollission()
+                    .strength(0.3F).sound(SoundType.CORAL_BLOCK).pushReaction(PushReaction.DESTROY));
 
     private ModBlocks() {
     }

@@ -20,7 +20,7 @@ final class TreeBits {
 
     /** Ground a drowned tree can stand on. */
     static boolean isGround(BlockState state) {
-        return state.is(BlockTags.DIRT) || state.is(Blocks.CLAY) || state.is(Blocks.SAND) || state.is(Blocks.GRAVEL)
+        return state.is(BlockTags.DIRT) || state.is(Blocks.CLAY) || state.is(Blocks.SAND) || state.is(Blocks.GRAVEL) || state.is(Blocks.PACKED_MUD)
                 || state.is(ModBlocks.ROT_MUD.get()) || state.is(ModBlocks.SALT_CRUST.get());
     }
 

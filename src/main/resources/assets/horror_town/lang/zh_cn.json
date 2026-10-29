@@ -109,5 +109,11 @@
   "block.horror_town.salt_line": "盐线",
   "block.horror_town.soul_lamp": "引魂灯",
   "item.horror_town.tide_glass": "窥潮镜",
-  "effect.horror_town.bound": "镇住"
+  "effect.horror_town.bound": "镇住",
+  "block.horror_town.barnacles": "藤壶",
+  "biome.horror_town.brine_waste": "盐碱荒原",
+  "biome.horror_town.barnacle_wood": "藤壶林",
+  "biome.horror_town.mildew_plains": "霉原",
+  "biome.horror_town.sodden_taiga": "湿杉林",
+  "biome.horror_town.weeping_crags": "泣岩山"
 }
