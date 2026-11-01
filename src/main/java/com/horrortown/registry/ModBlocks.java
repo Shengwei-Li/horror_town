@@ -20,7 +20,7 @@ public final class ModBlocks {
     /** 腐泥 */
     public static final DeferredBlock<RotMudBlock> ROT_MUD = BLOCKS.registerBlock("rot_mud", RotMudBlock::new,
             BlockBehaviour.Properties.of().mapColor(MapColor.TERRACOTTA_BLACK).strength(0.5F).sound(SoundType.MUD)
-                    .speedFactor(0.8F).isValidSpawn((state, level, pos, type) -> false));
+                    .speedFactor(0.8F));
     /** 盐壳 */
     public static final DeferredBlock<Block> SALT_CRUST = BLOCKS.registerSimpleBlock("salt_crust",
             BlockBehaviour.Properties.of().mapColor(MapColor.SNOW).strength(0.6F).sound(SoundType.CALCITE));

@@ -95,15 +95,15 @@
     "water_ambient": [
       {
         "type": "minecraft:cod",
-        "weight": 15,
+        "weight": 10,
         "minCount": 3,
         "maxCount": 6
       },
       {
         "type": "horror_town:face_fish",
-        "weight": 20,
-        "minCount": 2,
-        "maxCount": 4
+        "weight": 40,
+        "minCount": 3,
+        "maxCount": 6
       }
     ],
     "water_creature": [

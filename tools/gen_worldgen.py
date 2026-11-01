@@ -232,7 +232,8 @@ BIOMES = {
         "minecraft:patch_grass_normal", "minecraft:patch_dead_bush",
         "minecraft:brown_mushroom_swamp", "minecraft:patch_pumpkin",
     ], fossils=True), spawners(
-        creature=FARM_ANIMALS + [spawn("minecraft:frog", 10, 2, 5), spawn(f"{MOD}:tooth_snail", 6, 1, 2)],
+        creature=FARM_ANIMALS + [spawn("minecraft:frog", 10, 2, 5), spawn(f"{MOD}:tooth_snail", 16, 2, 4),
+                                 spawn(f"{MOD}:eye_crab", 10, 2, 4)],
         monster=LAND_MONSTERS + [spawn("minecraft:slime", 40, 2, 4), spawn(f"{MOD}:drowned_one", 60, 1, 3),
                                  spawn(f"{MOD}:mud_lurker", 6, 1, 1), spawn(f"{MOD}:paper_effigy", 20, 1, 1),
                                  spawn(f"{MOD}:leech_eel", 30, 2, 3), spawn(f"{MOD}:hairless_dog", 10, 1, 1)],
@@ -245,8 +246,8 @@ BIOMES = {
     }, features([
         "minecraft:glow_lichen", f"{MOD}:dead_tree_rare", "minecraft:patch_dead_bush",
     ], fossils=True, film=True), spawners(
-        creature=[spawn("minecraft:frog", 4, 1, 3), spawn(f"{MOD}:tooth_snail", 10, 1, 2),
-                  spawn(f"{MOD}:eye_crab", 12, 3, 6)],
+        creature=[spawn("minecraft:frog", 4, 1, 3), spawn(f"{MOD}:tooth_snail", 20, 2, 4),
+                  spawn(f"{MOD}:eye_crab", 28, 3, 6)],
         monster=LAND_MONSTERS + [spawn(f"{MOD}:drowned_one", 80, 2, 3), spawn(f"{MOD}:mud_lurker", 10, 1, 1),
                                  spawn(f"{MOD}:leech_eel", 60, 2, 4), spawn(f"{MOD}:fishman", 30, 3, 4),
                                  spawn(f"{MOD}:hairless_dog", 8, 1, 1)],
@@ -258,7 +259,7 @@ BIOMES = {
     }, features([
         "minecraft:glow_lichen", f"{MOD}:dead_tree_rare", "minecraft:patch_dead_bush",
     ], fossils=True), spawners(
-        creature=[spawn("minecraft:rabbit", 4, 2, 3), spawn(f"{MOD}:eye_crab", 6, 2, 4)],
+        creature=[spawn("minecraft:rabbit", 4, 2, 3), spawn(f"{MOD}:eye_crab", 16, 2, 4), spawn(f"{MOD}:tooth_snail", 8, 1, 3)],
         monster=LAND_MONSTERS + [spawn(f"{MOD}:salt_husk", 100, 2, 4), spawn(f"{MOD}:paper_effigy", 10, 1, 1),
                                  spawn(f"{MOD}:hairless_dog", 10, 1, 1)],
     ), downfall=0.2),
@@ -273,7 +274,7 @@ BIOMES = {
         "minecraft:patch_waterlily", "minecraft:brown_mushroom_normal", "minecraft:red_mushroom_normal",
         "minecraft:seagrass_swamp",
     ]), spawners(
-        creature=FARM_ANIMALS + [spawn("minecraft:fox", 8, 2, 4)],
+        creature=FARM_ANIMALS + [spawn("minecraft:fox", 8, 2, 4), spawn(f"{MOD}:tooth_snail", 12, 2, 3)],
         monster=LAND_MONSTERS + [spawn(f"{MOD}:hanged_one", 80, 1, 2), spawn(f"{MOD}:paper_effigy", 20, 1, 1),
                                  spawn(f"{MOD}:drowned_one", 30, 1, 2)],
     )),
@@ -287,7 +288,7 @@ BIOMES = {
         f"{MOD}:wrecked_boat", f"{MOD}:sea_stela_common", "minecraft:glow_lichen", f"{MOD}:dead_tree_rare",
         "minecraft:patch_grass_plain", "minecraft:patch_dead_bush",
     ], fossils=True, seeps=True), spawners(
-        creature=[spawn("minecraft:rabbit", 6, 2, 3), spawn(f"{MOD}:eye_crab", 4, 1, 3)],
+        creature=[spawn("minecraft:rabbit", 6, 2, 3), spawn(f"{MOD}:eye_crab", 10, 2, 3), spawn(f"{MOD}:tooth_snail", 6, 1, 2)],
         monster=LAND_MONSTERS + [spawn(f"{MOD}:salt_husk", 60, 2, 3), spawn(f"{MOD}:hairless_dog", 20, 1, 2),
                                  spawn(f"{MOD}:paper_effigy", 15, 1, 1)],
     ), downfall=0.3),
@@ -317,7 +318,7 @@ BIOMES = {
         "minecraft:patch_sugar_cane",
         f"{MOD}:barnacle_trunks",
     ], pools=True, seeps=True), spawners(
-        creature=FARM_ANIMALS + [spawn("minecraft:horse", 2, 2, 4), spawn(f"{MOD}:tooth_snail", 6, 1, 2)],
+        creature=FARM_ANIMALS + [spawn("minecraft:horse", 2, 2, 4), spawn(f"{MOD}:tooth_snail", 10, 2, 3)],
         monster=INLAND_MONSTERS + [spawn(f"{MOD}:paper_effigy", 20, 1, 1), spawn(f"{MOD}:hairless_dog", 10, 1, 2)],
     )),
     # 湿杉林: dark spruce dripping with lichen, the ground soft with needles and moss; things hang from the branches
@@ -353,7 +354,7 @@ BIOMES = {
     ]), spawners(
         monster=LAND_MONSTERS + [spawn("minecraft:drowned", 70, 1, 2)],
         water_creature=[spawn("minecraft:squid", 3, 1, 4)],
-        water_ambient=[spawn("minecraft:cod", 15, 3, 6), spawn(f"{MOD}:face_fish", 20, 2, 4)],
+        water_ambient=[spawn("minecraft:cod", 10, 3, 6), spawn(f"{MOD}:face_fish", 40, 3, 6)],
     ), downfall=0.5),
     # 渊沟: where the sea goes black. Something lives down here.
     "abyssal_trench": biome(0.5, {
@@ -365,7 +366,7 @@ BIOMES = {
     ]), spawners(
         monster=LAND_MONSTERS + [spawn("minecraft:drowned", 100, 1, 3)],
         water_creature=[spawn("minecraft:squid", 1, 1, 2)],
-        water_ambient=[spawn("minecraft:cod", 5, 1, 3), spawn(f"{MOD}:face_fish", 5, 1, 2)],
+        water_ambient=[spawn("minecraft:cod", 5, 1, 3), spawn(f"{MOD}:face_fish", 15, 2, 4)],
     ), downfall=0.5),
 }
 
@@ -443,8 +444,8 @@ FLOOR = {"type": "minecraft:stone_depth", "offset": 0, "surface_type": "floor", 
 UNDER_FLOOR = {"type": "minecraft:stone_depth", "offset": 0, "surface_type": "floor", "add_surface_depth": True,
                "secondary_depth_range": 0}
 ABOVE_WATER = {"type": "minecraft:water", "offset": -1, "surface_depth_multiplier": 0, "add_stone_depth": False}
-# true on the low band around sea level, where the swamp-style puddles go
-AT_SEA_LEVEL = [y_above(SEA_LEVEL - 1), not_(y_above(SEA_LEVEL + 2))]
+# exactly the top layer of the sea (y 65): a puddle any higher stands above the sea and runs off in little falls
+AT_SEA_LEVEL = [y_above(SEA_LEVEL - 1), not_(y_above(SEA_LEVEL))]
 ROT_MUD = f"{MOD}:rot_mud"
 SALT = f"{MOD}:salt_crust"
 

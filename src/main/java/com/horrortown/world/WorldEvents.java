@@ -34,6 +34,7 @@ public final class WorldEvents {
         if (event.getLevel() instanceof ServerLevel level && FogHarbor.is(level)) {
             FogWeather.get(level).tick(level);
             TideNight.get(level).tick(level);
+            FogSpawns.tick(level);
         }
     }
 

@@ -68,6 +68,12 @@
         "weight": 8,
         "minCount": 2,
         "maxCount": 4
+      },
+      {
+        "type": "horror_town:tooth_snail",
+        "weight": 12,
+        "minCount": 2,
+        "maxCount": 3
       }
     ],
     "misc": [],

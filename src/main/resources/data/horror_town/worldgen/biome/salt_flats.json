@@ -41,9 +41,15 @@
       },
       {
         "type": "horror_town:eye_crab",
-        "weight": 6,
+        "weight": 16,
         "minCount": 2,
         "maxCount": 4
+      },
+      {
+        "type": "horror_town:tooth_snail",
+        "weight": 8,
+        "minCount": 1,
+        "maxCount": 3
       }
     ],
     "misc": [],

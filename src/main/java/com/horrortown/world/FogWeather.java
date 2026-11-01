@@ -40,6 +40,11 @@ public class FogWeather extends SavedData {
         return tag;
     }
 
+    /** How thick the fog is now, 0 (clear) to 1 (a bank you cannot see your hand in). */
+    public float level() {
+        return this.level;
+    }
+
     public void tick(ServerLevel world) {
         if (--this.ticksLeft > 0) {
             if (this.ticksLeft % 200 == 0) {

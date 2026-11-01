@@ -45,6 +45,12 @@ public final class ClientFog {
     private static final float TIDE_MAX_FOG = 0.2F;
     private static final float TIDE_NEAR = 40.0F;
     private static final float TIDE_FAR = 150.0F;
+    /** Under water: how far you see (clear weather, and in a fog bank), and the colour of the silt. */
+    private static final float MURK_FAR = 14.0F;
+    private static final float MURK_FAR_BANK = 7.0F;
+    private static final float MURK_R = 0.16F;
+    private static final float MURK_G = 0.19F;
+    private static final float MURK_B = 0.14F;
     /** How much farther you see through the fog with the Tide Mother's veil on. */
     private static final float VEIL_SIGHT = 1.8F;
     /** While the Tide Mother is up the haze draws back far enough that she can be seen whole from the shore. */
@@ -117,6 +123,14 @@ public final class ClientFog {
 
     @SubscribeEvent
     public static void onRenderFog(ViewportEvent.RenderFog event) {
+        if (active() && event.getType() == FogType.WATER) {
+            // the sea here is thick with silt: under it you see a few blocks, less in a fog bank
+            float far = Mth.lerp(Math.min(1.0F, thickness()), MURK_FAR, MURK_FAR_BANK);
+            event.setFarPlaneDistance(Math.min(event.getFarPlaneDistance(), far));
+            event.setNearPlaneDistance(-4.0F);
+            event.setCanceled(true);
+            return;
+        }
         if (!active() || event.getType() != FogType.NONE || event.getMode() != FogRenderer.FogMode.FOG_TERRAIN) {
             return;
         }
@@ -154,6 +168,14 @@ public final class ClientFog {
 
     @SubscribeEvent
     public static void onFogColor(ViewportEvent.ComputeFogColor event) {
+        if (active() && event.getCamera().getFluidInCamera() == FogType.WATER) {
+            // murky brown-green, darker the less daylight gets down to you
+            float light = Mth.clamp(Minecraft.getInstance().level.getSkyDarken((float) event.getPartialTick()), 0.25F, 1.0F);
+            event.setRed(MURK_R * light);
+            event.setGreen(MURK_G * light);
+            event.setBlue(MURK_B * light);
+            return;
+        }
         if (!active() || event.getCamera().getFluidInCamera() != FogType.NONE) {
             return;
         }
